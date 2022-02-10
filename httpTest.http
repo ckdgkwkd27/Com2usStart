@@ -1,0 +1,16 @@
+POST http://localhost:7038/Login
+Content-Type: application/json
+
+{
+  "_ID":"Test",
+  "_Password":"Man"
+}
+
+###
+POST http://localhost:7038/Join
+Content-Type: application/json
+
+{
+  "_ID":"NewPerson",
+  "_Password":"Hello"
+}
