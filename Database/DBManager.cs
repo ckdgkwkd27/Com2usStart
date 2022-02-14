@@ -20,7 +20,6 @@ public class DBManager
     private static readonly Lazy<DBManager> _instance = new Lazy<DBManager>(() => new DBManager());
     public static DBManager Instance { get { return _instance.Value; } }
 
-    //RedisConfig가 머하는애지...?
     public void Init(IConfiguration conf)
     {
         GameDBConnectString = conf.GetSection("DBConnection")["Mysql"];
