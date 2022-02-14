@@ -1,48 +1,70 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using CloudStructures.Structures;
 using Dapper;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
+using ZLogger;
 
-namespace com2us_start.Controllers
+namespace com2us_start.Controllers;
+
+[Route("[controller]")]
+[ApiController]
+public class LoginController : ControllerBase
 {
-    [Route("[controller]")]
-    [ApiController]
-    public class LoginController : ControllerBase
+    private readonly ILogger Logger;
+    private IMemoryCache MemoryCache;
+
+    public LoginController(ILogger<LoginController> logger, IMemoryCache memoryCache)
     {
-        private readonly ILogger Logger;
+        Logger = logger;
+        MemoryCache = memoryCache; 
+    }
 
-        public LoginController(ILogger<LoginController> logger)
+    [HttpPost]
+    public async Task<LoginResponse> Post(LoginRequest request)
+    {
+        //ZLogger 적용
+        Logger.ZLogInformation($"[Request Login] ID:{request._ID}, PW:{request._Password}");
+        Logger.ZLogDebug($"[Request Login] ID:{request._ID}, PW:{request._Password}");
+        
+        var response = new LoginResponse();
+        response.Result = ErrorCode.None;
+        
+        using (var conn = await DBManager.Instance.GetDBConnection())
         {
-            Logger = logger;
-        }
+            var memberInfo = await conn.QuerySingleOrDefaultAsync<Member>(
+                @"select ID, Password, Salt from com2us.account where ID=@id", 
+                new { id = request._ID });
 
-        [HttpPost]
-        public async Task<LoginResponse> Post(LoginRequest request)
-        {
-            Logger.LogInformation($"[Request Login] ID:{request._ID}, PW:{request._Password}");
-
-            var response = new LoginResponse();
-            response.Result = ErrorCode.NONE;
-
-            using (var conn = await DBManager.Instance.GetDBConnection())
+            if (memberInfo == null || string.IsNullOrEmpty(memberInfo.password))
             {
-                var memberInfo = await conn.QuerySingleOrDefaultAsync<Member>(
-                    @"select ID, Password from com2us.account where ID=@id and Password=@pwd", 
-                    new { 
-                        id = request._ID, 
-                        pwd = request._Password 
-                    });
-
-                if (memberInfo == null || string.IsNullOrEmpty(memberInfo.password))
-                {
-                    response.Result = ErrorCode.LOGIN_FAIL_NOTUSER;
-                    return response;
-                }
+                response.Result = ErrorCode.Login_Fail_NotUser;
+                return response;
             }
 
-            return response;
+            var hashingPassword = DBManager.Instance.MakeHashingPassword(memberInfo.salt, request._Password);
+            if (memberInfo.password != hashingPassword)
+            {
+                response.Result = ErrorCode.Login_Fail_Exception;
+                return response;
+            }
         }
+        
+        //유효기간 하루
+        string tokenValue = DBManager.Instance.AuthToken();
+        var defaultExpiry = TimeSpan.FromDays(1);
+        var redisId = new RedisString<string>(DBManager.Instance.RedisConn, request._ID, defaultExpiry);
+        await redisId.SetAsync(tokenValue);
+
+        response.AuthToken = tokenValue;
+        
+        if (response.Result == ErrorCode.None)
+        {
+            Logger.ZLogInformation("Login Success!! Hi", request._ID);
+        }
+        return response;
     }
 }
+
 
 public class LoginRequest
 {
@@ -53,5 +75,5 @@ public class LoginRequest
 public class LoginResponse
 {
     public ErrorCode Result { get; set; }
+    public string AuthToken { get; set; }
 }
-

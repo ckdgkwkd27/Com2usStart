@@ -8,5 +8,11 @@
         {
             return builder.UseMiddleware<CheckUserMiddleware>();
         }
+
+        public static IApplicationBuilder UseLoggingMiddleware(
+            this IApplicationBuilder builder)
+        {
+            return builder.UseMiddleware<LoggingMiddleware>();
+        }
     }
 }

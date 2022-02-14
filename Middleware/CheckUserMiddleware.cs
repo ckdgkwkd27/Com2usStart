@@ -21,11 +21,18 @@ namespace com2us_start.Middleware
                 string body = bodystream.ReadToEndAsync().Result;
 
                 var obj = (JObject)JsonConvert.DeserializeObject(body);
-                var userID = (string)obj["ID"];
-                if(string.IsNullOrEmpty(userID))
+                string userID = null;
+
+                if (string.IsNullOrEmpty((string)obj["ID"]))
                 {
                     return;
                 }
+                userID = (string)obj["ID"];
+                if (string.IsNullOrEmpty(userID))
+                {
+                    return; 
+                }
+                
 
                 context.Request.Body = new MemoryStream(Encoding.UTF8.GetBytes(body)); 
             }

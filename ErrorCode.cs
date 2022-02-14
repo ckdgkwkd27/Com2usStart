@@ -1,12 +1,12 @@
 ﻿
 public enum ErrorCode : int
 {
-    NONE = 0,
+    None = 0,
 
-    JOIN_FAIL_DUPLICATE = 11,
-    JOIN_FAIL_EXCEPTION = 12,
+    Join_Fail_Duplicate = 11,
+    Join_Fail_Exception = 12,
 
-    LOGIN_FAIL_NOTUSER = 17,
-    LOGIN_FAIL_EXCEPTION = 18,
+    Login_Fail_NotUser = 17,
+    Login_Fail_Exception = 18,
 }
 
