@@ -2,8 +2,8 @@ POST http://localhost:7038/Login
 Content-Type: application/json
 
 {
-  "_ID":"SampleMan",
-  "_Password":"sample"
+  "ID":"zxzx",
+  "Password":"113"
 }
 
 ###
@@ -11,6 +11,6 @@ POST http://localhost:7038/Join
 Content-Type: application/json
 
 {
-  "_ID":"SampleMan",
-  "_Password":"sample"
+  "ID":"zxzx",
+  "Password":"113"
 }

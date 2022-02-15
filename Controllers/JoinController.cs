@@ -20,50 +20,58 @@ public class JoinController : ControllerBase
     public async Task<JoinResponse> Post(JoinRequest request)
     {
         //ZLogger 적용
-        Logger.ZLogDebug($"[Request Join] ID:{request._ID}, PW:{request._Password}");
+        Logger.ZLogDebug($"[Request Join] ID:{request.ID}, PW:{request.Password}");
         
         var response = new JoinResponse() { Result = ErrorCode.None };
 
-        var saltValue = DBManager.Instance.SaltString();
-        var hashingPassword = DBManager.Instance.MakeHashingPassword(saltValue, request._Password);
-            
-        using (var conn = await DBManager.Instance.GetDBConnection())
+        var saltValue = MysqlManager.Instance.SaltString();
+        var hashingPassword = MysqlManager.Instance.MakeHashingPassword(saltValue, request.Password);
+        
+        try
         {
-            try
-            {
-                var count = await conn.ExecuteAsync(@"INSERT com2us.account(ID, Password, Salt) Values(@id, @pwd, @salt)",
-                    new
-                    {
-                        id = request._ID,
-                        pwd = hashingPassword,
-                        salt = saltValue,
-                    });
+            var count = MysqlManager.Instance.InsertAccountQuery(request.ID, hashingPassword, saltValue);
 
-                if (count != 1)
-                {
-                    response.Result = ErrorCode.Join_Fail_Duplicate;
-                }
-            }
-            catch (Exception ex)
+            if (count.Result != 1)
             {
-                Console.WriteLine(ex.ToString());
-                response.Result = ErrorCode.Join_Fail_Exception;
-                return response;
+                response.Result = ErrorCode.Join_Fail_Duplicate;
             }
         }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+            response.Result = ErrorCode.Join_Fail_Exception;
+            return response;
+        }
+        
 
         if (response.Result == ErrorCode.None)
         {
-            Logger.ZLogInformation("Join Success!! Welcome {0}", request._ID);
+            Logger.ZLogInformation("Join Success!! Welcome {0}", request.ID);
+            
+            //Player Data 생성
+            var str = MysqlManager.Instance.InsertPlayer(
+                id: request.ID,
+                level: 1,
+                exp: 0,
+                gameMoney: 0
+            );
+
+            if (str.Result != 1)
+            {
+                Logger.ZLogError("ERROR: Player Create Failed!");
+                response.Result = ErrorCode.Join_Fail_PlayerFailed;
+                return response;
+            }
         }
+        
         return response;
     }
 }
 
 public class JoinRequest
 {
-    public string _ID { get; set; }
-    public string _Password { get; set; }
+    public string ID { get; set; }
+    public string Password { get; set; }
 }
 
 public class JoinResponse

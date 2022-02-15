@@ -18,11 +18,3 @@ public class LoggingMiddleware
         _logger.LogInformation("처리 종료");
     }
 }
-
-public static class LoggingMiddlewareExtensions
-{
-    /*public static IApplicationBuilder UseLoggingMiddleware(this IApplicationBuilder builder)
-    {
-        return builder.UseMiddleware<LoggingMiddleware>();
-    }*/
-}

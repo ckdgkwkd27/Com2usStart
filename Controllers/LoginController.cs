@@ -23,44 +23,59 @@ public class LoginController : ControllerBase
     public async Task<LoginResponse> Post(LoginRequest request)
     {
         //ZLogger 적용
-        Logger.ZLogInformation($"[Request Login] ID:{request._ID}, PW:{request._Password}");
-        Logger.ZLogDebug($"[Request Login] ID:{request._ID}, PW:{request._Password}");
-        
+        Logger.ZLogInformation($"[Request Login] ID:{request.ID}, PW:{request.Password}");
+
         var response = new LoginResponse();
         response.Result = ErrorCode.None;
-        
-        using (var conn = await DBManager.Instance.GetDBConnection())
+
+        var memberInfo = MysqlManager.Instance.SelectMemberQuery(request.ID);
+
+        if (string.IsNullOrEmpty(memberInfo.Result.password))
         {
-            var memberInfo = await conn.QuerySingleOrDefaultAsync<Member>(
-                @"select ID, Password, Salt from com2us.account where ID=@id", 
-                new { id = request._ID });
+            response.Result = ErrorCode.Login_Fail_NotUser;
+            return response;
+        }
 
-            if (memberInfo == null || string.IsNullOrEmpty(memberInfo.password))
-            {
-                response.Result = ErrorCode.Login_Fail_NotUser;
-                return response;
-            }
-
-            var hashingPassword = DBManager.Instance.MakeHashingPassword(memberInfo.salt, request._Password);
-            if (memberInfo.password != hashingPassword)
-            {
-                response.Result = ErrorCode.Login_Fail_Exception;
-                return response;
-            }
+        var hashingPassword = MysqlManager.Instance.MakeHashingPassword(memberInfo.Result.salt, request.Password);
+        if (memberInfo.Result.password != hashingPassword)
+        {
+            response.Result = ErrorCode.Login_Fail_Exception;
+            return response;
         }
         
+        
         //유효기간 하루
-        string tokenValue = DBManager.Instance.AuthToken();
+        string tokenValue = RedisManager.Instance.AuthToken();
         var defaultExpiry = TimeSpan.FromDays(1);
-        var redisId = new RedisString<string>(DBManager.Instance.RedisConn, request._ID, defaultExpiry);
+        var redisId = new RedisString<string>(RedisManager.Instance.RedisConn, request.ID, defaultExpiry);
         await redisId.SetAsync(tokenValue);
 
         response.AuthToken = tokenValue;
         
         if (response.Result == ErrorCode.None)
         {
-            Logger.ZLogInformation("Login Success!! Hi", request._ID);
+            Logger.ZLogInformation($"Login Success!! Hi {request.ID}");
+            
+            //Player Data 로딩
+            var player = MysqlManager.Instance.SelectGamePlayerQuery(request.ID);
+            if (string.IsNullOrEmpty(player.Result.ID))
+            {
+                Logger.ZLogError("ERROR: Player Loading Failed!");
+                response.Result = ErrorCode.Login_Fail_NoPlayerData;
+                return response;
+            }
+            
+            Logger.ZLogInformation($"\nPlayer Data Load Completed!! \nID: {player.Result.ID}" + 
+                                   $"\nLevel: {player.Result.Level}, \nExp: {player.Result.Exp}, \nGameMoney: {player.Result.GameMoney}");
+
+            var playerRobotmon = MysqlManager.Instance.SelectPlayerRobotmonQuery(request.ID);
+            if (playerRobotmon.IsCompletedSuccessfully)
+            {
+                Logger.ZLogInformation("보유한 로봇몬: ");
+                
+            } 
         }
+        
         return response;
     }
 }
@@ -68,8 +83,8 @@ public class LoginController : ControllerBase
 
 public class LoginRequest
 {
-    public string _ID { get; set; }
-    public string _Password { get; set; }
+    public string ID { get; set; }
+    public string Password { get; set; }
 }
 
 public class LoginResponse

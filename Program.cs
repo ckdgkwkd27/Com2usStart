@@ -5,7 +5,7 @@ using com2us_start.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers().AddMvcOptions(options => options.Filters.Add(typeof(ResultFilterChangeResponse)));
+builder.Services.AddControllers();
 builder.Services.AddMemoryCache();
 
 builder.Logging.ClearProviders();
@@ -13,11 +13,6 @@ builder.Logging.AddZLoggerConsole();
 //builder.Logging.AddConsole();
 
 var app = builder.Build();
-
-if (false == app.Environment.IsDevelopment())
-{
-    app.UseDeveloperExceptionPage();
-}
 
 app.UseRouting();
 
@@ -27,7 +22,8 @@ app.UseLoggingMiddleware();
 app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
 
 IConfiguration configuration = app.Configuration;
-DBManager.Instance.Init(configuration);
+MysqlManager.Instance.Init((configuration));
+RedisManager.Instance.Init(configuration);
 
 app.Run();
 
