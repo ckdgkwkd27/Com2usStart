@@ -6,9 +6,7 @@
 <br/>
 
 ### 로봇몬고 ER-Diagram
-<br/>
 ![ERD](https://user-images.githubusercontent.com/30414979/154002511-7fa5514e-5fb1-4a5c-a280-5381e714f9f9.png)
-<br/>
 
 ### 추가된 내용(22.02.15)
 - Join시 Game Data 생성<br/>
