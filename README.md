@@ -4,7 +4,7 @@
 ```
 http://localhost:7038/Join: (회원가입) ID, Password 값을 전달하고 DB에 저장합니다.
 http://localhost:7038/Login: (로그인)  ID, Password 값을 전달하고 DB에서 계정이 유효한지 확인합니다. 
-http://localhost:7038/DataLoad: (게임데이터 로드)  ID, AuthToken 값을 전달하고 일치하면 게임 데이터를 로드해줍니다.
+http://localhost:7038/DataLoad: (데이터 로드)  ID, AuthToken 값을 전달하고 일치하면 게임 데이터를 로드합니다.
 ```
 <br/>
 
