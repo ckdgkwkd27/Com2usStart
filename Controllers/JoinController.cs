@@ -24,8 +24,8 @@ public class JoinController : ControllerBase
         
         var response = new JoinResponse() { Result = ErrorCode.None };
 
-        var saltValue = MysqlManager.Instance.SaltString();
-        var hashingPassword = MysqlManager.Instance.MakeHashingPassword(saltValue, request.Password);
+        var saltValue = CryptoManager.Instance.SaltString();
+        var hashingPassword = CryptoManager.Instance.MakeHashingPassword(saltValue, request.Password);
         
         try
         {
@@ -35,18 +35,11 @@ public class JoinController : ControllerBase
             {
                 response.Result = ErrorCode.Join_Fail_Duplicate;
             }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.ToString());
-            response.Result = ErrorCode.Join_Fail_Exception;
-            return response;
-        }
-        
 
-        if (response.Result == ErrorCode.None)
-        {
-            Logger.ZLogInformation("Join Success!! Welcome {0}", request.ID);
+
+            if (response.Result == ErrorCode.None)
+        
+                Logger.ZLogInformation("Join Success!! Welcome {0}", request.ID);
             
             //Player Data 생성
             var str = MysqlManager.Instance.InsertPlayer(
@@ -64,6 +57,12 @@ public class JoinController : ControllerBase
             }
         }
         
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+            response.Result = ErrorCode.Join_Fail_Exception;
+            return response;
+        }
         return response;
     }
 }

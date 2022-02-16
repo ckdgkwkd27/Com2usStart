@@ -2,8 +2,8 @@ POST http://localhost:7038/Login
 Content-Type: application/json
 
 {
-  "ID":"zxzx",
-  "Password":"113"
+  "ID":"aagg",
+  "Password":"aagg"
 }
 
 ###
@@ -11,6 +11,15 @@ POST http://localhost:7038/Join
 Content-Type: application/json
 
 {
-  "ID":"zxzx",
-  "Password":"113"
+  "ID":"aagg",
+  "Password":"aagg"
+}
+
+###
+POST http://localhost:7038/DataLoad
+Content-Type: application/json
+
+{
+  "ID":"aagg",
+  "AuthToken":"algt2vrld8odoi2ws1d4arjov"
 }
