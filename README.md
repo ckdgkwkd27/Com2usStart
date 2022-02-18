@@ -18,7 +18,8 @@ http://localhost:7038/Mail (우편함) ID, AuthToken 값을 전달하고 일치�
 <br/>
 
 ### 로봇몬고 ER-Diagram
-![ERD](https://user-images.githubusercontent.com/30414979/154617673-7fab160f-55a1-4c45-8589-aab398b4916e.png)
+![ERD](https://user-images.githubusercontent.com/30414979/154620692-1300e013-377f-4130-957a-7a05ae4d2ad6.png)
+
 
 
 <br/><br/>
