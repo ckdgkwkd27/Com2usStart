@@ -24,31 +24,25 @@ public class DataLoadController : ControllerBase
 
         try
         {
-            var playerInfo = MysqlManager.Instance.SelectGamePlayerQuery(request.ID);
-            if (string.IsNullOrEmpty(playerInfo.Result.ID))
+            //Token 확인
+            response.Result = await RedisManager.Instance.TokenCheck(request.ID, request.AuthToken);
+            if (response.Result == ErrorCode.Token_Fail_NotAuthorized)
+            {
+                return response;
+            }
+
+            //DB에서 체크
+            var playerInfo = await MysqlManager.Instance.SelectGamePlayerQuery(request.ID);
+            if (null == playerInfo)
             {
                 response.Result = ErrorCode.Load_Fail_NotUser;
                 return response;
             }
-
-            //Redis에서 체크
-            var defaultExpiry = TimeSpan.FromDays(1);
-            var redisId = new RedisString<string>(RedisManager.Instance.RedisConn, request.ID, defaultExpiry);
-            if (redisId.GetAsync().Result.Value != request.AuthToken)
-            {
-                response.Result = ErrorCode.Load_Fail_NotAuthorized;
-                return response;
-            }
             
-            Logger.ZLogInformation($"\nPlayer Data Load Completed!! \nID: {playerInfo.Result.ID}" + 
-                                   $"\nLevel: {playerInfo.Result.Level}, \nExp: {playerInfo.Result.Exp}, \nGameMoney: {playerInfo.Result.GameMoney}");
+            Logger.ZLogInformation($"\nPlayer Data Load Completed!! \nID: {playerInfo.ID}" + 
+                                   $"\nLevel: {playerInfo.Level}, \nExp: {playerInfo.Exp}, \nGameMoney: {playerInfo.GameMoney}");
 
-            var playerRobotmon = MysqlManager.Instance.SelectPlayerRobotmonQuery(request.ID);
-            if (playerRobotmon.IsCompletedSuccessfully)
-            {
-                Logger.ZLogInformation("보유한 로봇몬: ");
-                
-            } 
+            response.Player = playerInfo;
         }
         catch (Exception ex)
         {
@@ -70,6 +64,7 @@ public class LoadRequest
 public class LoadResponse
 {
     public ErrorCode Result { get; set; }
+    public GamePlayer? Player { get; set; }
 }
 
 

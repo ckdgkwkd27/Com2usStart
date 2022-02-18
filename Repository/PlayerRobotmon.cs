@@ -11,6 +11,5 @@ public class PlayerRobotmon
     public int CatchedLocX { get; set; }
     public int CatchedLocY { get; set; }
     public int Reinforcement { get; set; }
-    //DateTime으로도?
-    public string CatchedDate { get; set; }
+    public DateTime CatchedDate { get; set; }
 }

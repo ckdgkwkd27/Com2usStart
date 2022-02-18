@@ -2,7 +2,9 @@
 public enum ErrorCode : int
 {
     None = 0,
-
+    
+    Token_Fail_NotAuthorized = 1,
+    
     Join_Fail_Duplicate = 11,
     Join_Fail_Exception = 12,
     Join_Fail_PlayerFailed = 13,
@@ -12,6 +14,12 @@ public enum ErrorCode : int
 
     Load_Fail_NotUser = 31,
     Load_Fail_Exception = 32,
-    Load_Fail_NotAuthorized = 33,
+    
+    Attend_Fail_NotUser = 41,
+    Attend_Fail_Exception = 42,
+    
+    Mail_Fail_Empty = 51,
+    Mail_Fail_Exception = 52,
+    Mail_Fail_CannotSend = 53,
 }
 

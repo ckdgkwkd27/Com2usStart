@@ -25,20 +25,19 @@ public class LoginController : ControllerBase
         //ZLogger 적용
         Logger.ZLogInformation($"[Request Login] ID:{request.ID}, PW:{request.Password}");
 
-        var response = new LoginResponse();
-        response.Result = ErrorCode.None;
-
+        var response = new LoginResponse() { Result = ErrorCode.None };
+        
         try
         {
-            var memberInfo = MysqlManager.Instance.SelectMemberQuery(request.ID);
-            if (string.IsNullOrEmpty(memberInfo.Result.password))
+            var memberInfo = await MysqlManager.Instance.SelectMemberQuery(request.ID);
+            if (null == memberInfo)
             {
                 response.Result = ErrorCode.Login_Fail_NotUser;
                 return response;
             }
 
-            var hashingPassword = CryptoManager.Instance.MakeHashingPassword(memberInfo.Result.salt, request.Password);
-            if (memberInfo.Result.password != hashingPassword)
+            var hashingPassword = CryptoManager.Instance.MakeHashingPassword(memberInfo.salt, request.Password);
+            if (memberInfo.password != hashingPassword)
             {
                 response.Result = ErrorCode.Login_Fail_Exception;
                 return response;
@@ -50,8 +49,7 @@ public class LoginController : ControllerBase
             response.Result = ErrorCode.Login_Fail_Exception;
             return response;
         }
-
-
+        
         //유효기간 하루
         string tokenValue = RedisManager.Instance.AuthToken();
         var defaultExpiry = TimeSpan.FromDays(1);

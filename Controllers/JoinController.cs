@@ -29,27 +29,29 @@ public class JoinController : ControllerBase
         
         try
         {
-            var count = MysqlManager.Instance.InsertAccountQuery(request.ID, hashingPassword, saltValue);
-
-            if (count.Result != 1)
+            var accountInsertCount =  await MysqlManager.Instance.InsertAccountQuery(request.ID, hashingPassword, saltValue);
+            if (accountInsertCount != 1)
             {
+                Logger.ZLogError("ERROR: Account Duplicate");
                 response.Result = ErrorCode.Join_Fail_Duplicate;
+                return response;
             }
 
 
             if (response.Result == ErrorCode.None)
-        
+            {
                 Logger.ZLogInformation("Join Success!! Welcome {0}", request.ID);
+            }
             
             //Player Data 생성
-            var str = MysqlManager.Instance.InsertPlayer(
+            var playerInsertCount = await MysqlManager.Instance.InsertPlayer(
                 id: request.ID,
                 level: 1,
                 exp: 0,
                 gameMoney: 0
             );
 
-            if (str.Result != 1)
+            if (playerInsertCount != 1)
             {
                 Logger.ZLogError("ERROR: Player Create Failed!");
                 response.Result = ErrorCode.Join_Fail_PlayerFailed;

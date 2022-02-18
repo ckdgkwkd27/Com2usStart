@@ -1,18 +1,19 @@
-POST http://localhost:7038/Login
-Content-Type: application/json
-
-{
-  "ID":"aagg",
-  "Password":"aagg"
-}
-
 ###
 POST http://localhost:7038/Join
 Content-Type: application/json
 
 {
-  "ID":"aagg",
-  "Password":"aagg"
+  "ID":"com2us",
+  "Password":"fighting"
+}
+
+###
+POST http://localhost:7038/Login
+Content-Type: application/json
+
+{
+  "ID":"com2us",
+  "Password":"fighting"
 }
 
 ###
@@ -20,6 +21,33 @@ POST http://localhost:7038/DataLoad
 Content-Type: application/json
 
 {
-  "ID":"aagg",
-  "AuthToken":"algt2vrld8odoi2ws1d4arjov"
+  "ID":"com2us",
+  "AuthToken":"i6aoeuaxm44bps66pxvli903v"
+}
+
+###
+POST http://localhost:7038/Attend
+Content-Type: application/json
+
+{
+  "ID":"com2us",
+  "AuthToken":"i6aoeuaxm44bps66pxvli903v"
+}
+
+###
+POST http://localhost:7038/AttendGift
+Content-Type: application/json
+
+{
+  "ID":"com2us",
+  "AuthToken":"i6aoeuaxm44bps66pxvli903v"
+}
+
+###
+POST  http://localhost:7038/Mail
+Content-Type: application/json
+
+{
+  "ID": "com2us",
+  "AuthToken": "i6aoeuaxm44bps66pxvli903v"
 }

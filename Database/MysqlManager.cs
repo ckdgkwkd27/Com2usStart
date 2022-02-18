@@ -47,7 +47,7 @@ public class MysqlManager
         return count;
     }
 
-    public async Task<Member> SelectMemberQuery(string Id)
+    public async Task<Member?> SelectMemberQuery(string Id)
     {
         await using var conn = await GetDBConnection();
         var memberInfo = await conn.QuerySingleOrDefaultAsync<Member>(
@@ -74,7 +74,7 @@ public class MysqlManager
         return count;
     }
     
-    public async Task<GamePlayer> SelectGamePlayerQuery(string Id)
+    public async Task<GamePlayer?> SelectGamePlayerQuery(string Id)
     {
         await using var conn = await GetDBConnection();
         var playerInfo = await conn.QuerySingleOrDefaultAsync<GamePlayer>(
@@ -85,7 +85,7 @@ public class MysqlManager
     }
     
     //PlayerRobotmon
-    public async Task<PlayerRobotmon> SelectPlayerRobotmonQuery(string Id)
+    public async Task<PlayerRobotmon?> SelectPlayerRobotmonQuery(string Id)
     {
         await using var conn = await GetDBConnection();
         var playerRobotmonInfo = await conn.QuerySingleOrDefaultAsync<PlayerRobotmon>(
@@ -93,5 +93,84 @@ public class MysqlManager
             new { id = Id});
             
         return playerRobotmonInfo;
+    }
+    
+    //Attendance
+    public async Task<int> InsertAttend(string id)
+    {
+        await using var conn = await GetDBConnection();
+        var count = await conn.ExecuteAsync(
+            @"INSERT com2us.attendance(ID, AttendDate, GiftDate) VALUES(@Id, @NowDate, @OldDate)",
+            new
+            {
+                @Id = id,
+                @NowDate = DateTime.Now,
+                @OldDate = DateTime.UnixEpoch,
+            });
+        
+        return count;
+    }
+
+    public async Task<Attendance?> SelectAttendQuery(string Id)
+    {
+        await using var conn = await GetDBConnection();
+        var attendInfo = await conn.QuerySingleOrDefaultAsync<Attendance>(
+            @"SELECT ID, AttendDate, GiftDate FROM com2us.attendance WHERE ID=@id",
+            new { id = Id });
+        return attendInfo;
+    }
+
+    public async Task<int> UpdateAttend(string Id, bool isGiftGiven = false)
+    {
+        await using var conn = await GetDBConnection();
+        int count;
+        
+        if (isGiftGiven)
+        {
+            count = await conn.ExecuteAsync(
+                @"UPDATE com2us.attendance SET AttendDate=@Now, GiftDate=@Now WHERE ID=@id",
+                new {@Now = DateTime.Now, id = Id});
+        }
+        else
+        {
+            count = await conn.ExecuteAsync(
+                @"UPDATE com2us.attendance SET AttendDate=@Now WHERE ID=@id",
+                new {@Now = DateTime.Now, id = Id});
+        }
+       
+        return count;
+    }
+    
+    
+    //Mail
+    public async Task<int> InsertMail(string recvId, string? itemId, string sendName, int amount, string title, string content)
+    {
+        await using var conn = await GetDBConnection();
+        var count = await conn.ExecuteAsync(
+            @"INSERT com2us.mail(MailID, RecvID, ItemID, SendName, RecvDate, Amount, Title, Content) VALUES(@_mailId, @_recvId, @_itemId,@_sendName, @_recvDate, @_amount, @_title, @_content)",
+            new 
+            {
+                @_mailId = Guid.NewGuid().ToString(),
+                @_recvId = recvId,
+                @_itemId = itemId,
+                @_sendName = sendName,
+                @_recvDate = DateTime.Now,
+                @_amount = amount,
+                @_title = title,
+                @_content = content
+            });
+        
+        return count;
+    }
+    
+    public async Task<List<Mail>> SelectMultipleMailQuery(string recvId)
+    {
+        await using var conn = await GetDBConnection();
+        var multi = await conn.QueryMultipleAsync(
+            @"SELECT * FROM com2us.mail WHERE RecvID=@id",
+            new { id = recvId }).ConfigureAwait(false);
+
+        var mails = multi.Read<Mail>().ToList();
+        return mails;
     }
 }

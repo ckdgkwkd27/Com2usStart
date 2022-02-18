@@ -1,5 +1,6 @@
 ﻿using System.Security.Cryptography;
 using CloudStructures;
+using CloudStructures.Structures;
 
 namespace com2us_start;
 
@@ -31,5 +32,18 @@ public class RedisManager
             random.GetBytes(bytes);
         }
         return new string(bytes.Select(x => allowableCharacters[x % allowableCharacters.Length]).ToArray());
+    }
+
+    public async Task<ErrorCode> TokenCheck(string id, string authToken)
+    {
+        //Redis에서 인증 토큰 체크
+        var defaultExpiry = TimeSpan.FromDays(1);
+        var redisId = new RedisString<string>(RedisManager.Instance.RedisConn, id, defaultExpiry);
+        var stringResult = await redisId.GetAsync();
+        if (stringResult.Value != authToken)
+        {
+            return ErrorCode.Token_Fail_NotAuthorized;
+        }
+        return ErrorCode.None;
     }
 }
