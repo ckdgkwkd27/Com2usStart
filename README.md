@@ -3,11 +3,16 @@
 ### 사용법
 ```
 http://localhost:7038/Join: (회원가입) ID, Password 값을 전달하고 DB에 저장합니다.
+
 http://localhost:7038/Login: (로그인)  ID, Password 값을 전달하고 DB에서 계정이 유효한지 확인합니다. 
+
 http://localhost:7038/DataLoad: (데이터 로드)  ID, AuthToken 값을 전달하고 일치하면 게임 데이터를 로드합니다.
+
 http://localhost:7038/Attend: (출석) ID, AuthToken 값을 전달하고 일치하면 DB에 출석기록을 추가/업데이트 합니다.
+
 http://localhost:7038/AttendGift (출석보상) ID, AuthToken 값을 전달하고 일치여부를 확인합니다. 플레이어가 보상을 받은지 
 일정기간이 지났다면 보상내역을 업데이트하고 편지를 발송합니다.
+
 http://localhost:7038/Mail (우편함) ID, AuthToken 값을 전달하고 일치여부를 확인합니다. 플레이어에게 수신된 모든 메일을 보여줍니다.
 ```
 <br/>
