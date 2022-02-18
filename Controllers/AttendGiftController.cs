@@ -31,7 +31,7 @@ public class AttendGiftController : ControllerBase
                 return response;
             }
 
-            //Attendance 테이블 조회해서 GiftDate가 null이거나 Time Limit을 넘었으면 선물 지급
+            //Attendance 테이블 조회해서 GiftDate가 UnixTime이거나 Time Limit을 넘었으면 선물 지급
             var attendGiftInfo = await MysqlManager.Instance.SelectAttendQuery(request.ID);
             if (attendGiftInfo == null)
             {
