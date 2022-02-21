@@ -7,7 +7,7 @@ public class Mail
     public string RecvID { get; set; }
     public string SendName { get; set; }
     public DateTime RecvDate { get; set; }
-    public int Amount { get; set; }
+    public Int32 Amount { get; set; }
     public string Title { get; set; }
     public string Content { get; set; }
 }

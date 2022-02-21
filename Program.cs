@@ -15,8 +15,6 @@ builder.Logging.AddZLoggerConsole();
 var app = builder.Build();
 
 app.UseRouting();
-
-//app.UseCheckUserMiddleware();
 app.UseLoggingMiddleware();
 
 app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
@@ -24,6 +22,7 @@ app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
 IConfiguration configuration = app.Configuration;
 MysqlManager.Instance.Init((configuration));
 RedisManager.Instance.Init(configuration);
+CsvTableLoader.Instance.Load();
 
 app.Run();
 

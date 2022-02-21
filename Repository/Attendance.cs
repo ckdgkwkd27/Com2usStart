@@ -6,4 +6,7 @@ public class Attendance
     public DateTime AttendDate { get; set; }
     //보상받은 날짜
     public DateTime GiftDate { get; set; }
+    
+    //며칠동안 출석했나요
+    public Int32 HowLongDays { get; set; }
 }

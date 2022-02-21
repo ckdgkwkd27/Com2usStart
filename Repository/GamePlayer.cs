@@ -3,7 +3,7 @@
 public class GamePlayer
 {
     public string ID { get; set; }
-    public int Level { get; set; }
-    public int Exp { get; set; }
-    public int GameMoney { get; set; }
+    public Int32 Level { get; set; }
+    public Int32 Exp { get; set; }
+    public Int32 GameMoney { get; set; }
 }

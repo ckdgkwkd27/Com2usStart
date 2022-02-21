@@ -37,6 +37,7 @@ public class AttendController : ControllerBase
              출석X => 테이블에 유저정보 추가
             */
             var attendUser = await MysqlManager.Instance.SelectAttendQuery(request.ID);
+            
             if (attendUser == null)
             {
                 var cnt = await MysqlManager.Instance.InsertAttend(request.ID);
@@ -46,7 +47,7 @@ public class AttendController : ControllerBase
                     response.Result = ErrorCode.Attend_Fail_NotUser;
                     return response;
                 }
-            }
+            } 
             else
             {
                 var memberUpdateCount = await MysqlManager.Instance.UpdateAttend(request.ID);

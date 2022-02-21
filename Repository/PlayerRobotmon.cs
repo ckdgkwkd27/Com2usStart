@@ -5,11 +5,11 @@ public class PlayerRobotmon
 {
     public string PlayerID { get; set; }
     public string RobotmonID { get; set; }
-    public int Level { get; set; }
-    public int HP { get; set; }
-    public int Star { get; set; }
-    public int CatchedLocX { get; set; }
-    public int CatchedLocY { get; set; }
-    public int Reinforcement { get; set; }
+    public Int32 Level { get; set; }
+    public Int32 HP { get; set; }
+    public Int32 Star { get; set; }
+    public Int32 CatchedLocX { get; set; }
+    public Int32 CatchedLocY { get; set; }
+    public Int32 Reinforcement { get; set; }
     public DateTime CatchedDate { get; set; }
 }

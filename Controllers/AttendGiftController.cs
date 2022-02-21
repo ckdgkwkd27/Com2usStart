@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using com2us_start.TableImpl;
+using Microsoft.AspNetCore.Mvc;
 using ZLogger;
 
 namespace com2us_start.Controllers;
@@ -8,7 +9,7 @@ namespace com2us_start.Controllers;
 public class AttendGiftController : ControllerBase
 {
     private readonly ILogger Logger;
-    private int TestMinutesLimit;
+    private Int32 TestMinutesLimit;
 
     public AttendGiftController(ILogger<AttendGiftController> logger)
     {
@@ -31,7 +32,7 @@ public class AttendGiftController : ControllerBase
                 return response;
             }
 
-            //Attendance 테이블 조회해서 GiftDate가 UnixTime이거나 Time Limit을 넘었으면 선물 지급
+            //Attendance 테이블 조회해서 GiftDate가 null이거나 Time Limit을 넘었으면 선물 지급
             var attendGiftInfo = await MysqlManager.Instance.SelectAttendQuery(request.ID);
             if (attendGiftInfo == null)
             {
@@ -46,13 +47,16 @@ public class AttendGiftController : ControllerBase
             if (elapsed.Minutes > TestMinutesLimit)
             {
                 //출석보상 편지를 우편함으로 보낸다
-                Logger.ZLogInformation("출석 환영합니다~~ 편지 보낼게요!!");
+                var tbl = AttendGiftTableImpl.GiftDict;
+                Logger.ZLogInformation("{0}일차 출석 환영합니다~~ 편지 보낼게요!!", attendGiftInfo.HowLongDays);
+                Logger.ZLogInformation("출석 보상: {0}", tbl[attendGiftInfo.HowLongDays].ItemName);
+
                 var mailInsertCount = await MysqlManager.Instance.InsertMail(
                     request.ID,
-                    null,
+                    tbl[attendGiftInfo.HowLongDays].ItemId,
                     "운영자",
-                    0,
-                    "출석 환영해요!",
+                    Int32.Parse(tbl[attendGiftInfo.HowLongDays].Amount),
+                    attendGiftInfo.HowLongDays + "일차 출석 환영해요!",
                     "접속 자주 해주세용");
                 
                 if (mailInsertCount != 1)

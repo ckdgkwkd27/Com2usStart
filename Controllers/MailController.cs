@@ -17,7 +17,7 @@ public class MailController : ControllerBase
     [HttpPost]
     public async Task<MailResponse> Post(MailRequest request)
     {
-        Logger.ZLogDebug($"[Request Join] ID:{request.ID}, Token:{request.AuthToken}");
+        Logger.ZLogDebug($"[Request] ID:{request.ID}, Token:{request.AuthToken}");
 
         var response = new MailResponse() { Result = ErrorCode.None };
 
@@ -44,7 +44,7 @@ public class MailController : ControllerBase
         catch (Exception ex)
         {
             Logger.ZLogError(ex.ToString());
-            response.RecvMail = null;
+            response.RecvMail = new List<Mail>();
             response.Result = ErrorCode.Mail_Fail_Exception;
             return response;
         }

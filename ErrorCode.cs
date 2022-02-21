@@ -1,5 +1,5 @@
 ﻿
-public enum ErrorCode : int
+public enum ErrorCode : Int32
 {
     None = 0,
     

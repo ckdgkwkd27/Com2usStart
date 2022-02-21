@@ -34,7 +34,7 @@ public class MysqlManager
     //Query를 내부에서 처리 
     
     //Member
-    public async Task<int> InsertAccountQuery(string id, string password, string salt)
+    public async Task<Int32> InsertAccountQuery(string id, string password, string salt)
     {
         await using var conn = await GetDBConnection();
         var count = await conn.ExecuteAsync(@"INSERT com2us.account(ID, Password, Salt) Values(@ID, @Pwd, @Salt)",
@@ -58,7 +58,7 @@ public class MysqlManager
     }
     
     //GamePlayer
-    public async Task<int> InsertPlayer(string id, int level, int exp, int gameMoney)
+    public async Task<Int32> InsertPlayer(string id, Int32 level, Int32 exp, Int32 gameMoney)
     {
         await using var conn = await GetDBConnection();
         var count = await conn.ExecuteAsync(
@@ -96,11 +96,11 @@ public class MysqlManager
     }
     
     //Attendance
-    public async Task<int> InsertAttend(string id)
+    public async Task<Int32> InsertAttend(string id)
     {
         await using var conn = await GetDBConnection();
         var count = await conn.ExecuteAsync(
-            @"INSERT com2us.attendance(ID, AttendDate, GiftDate) VALUES(@Id, @NowDate, @OldDate)",
+            @"INSERT com2us.attendance(ID, AttendDate, GiftDate, HowLongDays) VALUES(@Id, @NowDate, @OldDate, 0)",
             new
             {
                 @Id = id,
@@ -115,20 +115,20 @@ public class MysqlManager
     {
         await using var conn = await GetDBConnection();
         var attendInfo = await conn.QuerySingleOrDefaultAsync<Attendance>(
-            @"SELECT ID, AttendDate, GiftDate FROM com2us.attendance WHERE ID=@id",
+            @"SELECT ID, AttendDate, GiftDate, HowLongDays FROM com2us.attendance WHERE ID=@id",
             new { id = Id });
         return attendInfo;
     }
 
-    public async Task<int> UpdateAttend(string Id, bool isGiftGiven = false)
+    public async Task<Int32> UpdateAttend(string Id, bool isGiftGiven = false)
     {
         await using var conn = await GetDBConnection();
-        int count;
+        Int32 count;
         
         if (isGiftGiven)
         {
             count = await conn.ExecuteAsync(
-                @"UPDATE com2us.attendance SET AttendDate=@Now, GiftDate=@Now WHERE ID=@id",
+                @"UPDATE com2us.attendance SET AttendDate=@Now, GiftDate=@Now, HowLongDays = HowLongDays+1 WHERE ID=@id",
                 new {@Now = DateTime.Now, id = Id});
         }
         else
@@ -143,7 +143,7 @@ public class MysqlManager
     
     
     //Mail
-    public async Task<int> InsertMail(string recvId, string? itemId, string sendName, int amount, string title, string content)
+    public async Task<Int32> InsertMail(string recvId, string? itemId, string sendName, Int32 amount, string title, string content)
     {
         await using var conn = await GetDBConnection();
         var count = await conn.ExecuteAsync(

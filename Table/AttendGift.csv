@@ -1,0 +1,8 @@
+﻿출석,아이템 이름,아이템 아이디,아이템 타입,수량
+1,몬스터볼,id_monsterball,TYPE_MONSTERBALL,100
+2,희귀 코스튬,id_rarecostume,TYPE_COSTUME,1
+3,구급약,id_rescue,TYPE_CONSUMABLE,50
+4,보물지도,id_treasuremap,TYPE_MAP,1
+5,가챠 쿠폰,id_gotchacoupon,TYPE_CONSUMABLE,5
+6,부활석,id_revive,TYPE_GOODS,10
+7,돈,id_money,TYPE_MONEY,1000000
