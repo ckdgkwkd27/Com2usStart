@@ -8,52 +8,37 @@ namespace com2us_start.Controllers;
 [ApiController]
 public class AttendController : ControllerBase
 {
-    private readonly ILogger Logger;
+    private readonly ILogger _logger;
+    private readonly IConfiguration _conf;
 
     public AttendController(ILogger<AttendController> logger)
     {
-        Logger = logger;
+        _logger = logger;
+        
     }
 
     [HttpPost]
     public async Task<AttendResponse> Post(AttendRequest request)
     {
-        Logger.ZLogDebug($"[Request Join] ID:{request.ID}, Token:{request.AuthToken}");
-
         var response = new AttendResponse() { Result = ErrorCode.None };
 
         try
         {
-            //Token 확인
-            response.Result = await RedisManager.Instance.TokenCheck(request.ID, request.AuthToken);
-            if (response.Result == ErrorCode.Token_Fail_NotAuthorized)
+            var attendInfo = await MysqlManager.SelectGamePlayerQuery(request.UUID);
+            if (attendInfo == null)
             {
+                _logger.ZLogError("Wrong User ID");
+                response.Result = ErrorCode.Attend_Fail_NotUser;
                 return response;
             }
             
-            /*
-             출석이 되어있는지 확인
-             출석O => 기존 출석시간 업데이트
-             출석X => 테이블에 유저정보 추가
-            */
-            var attendUser = await MysqlManager.Instance.SelectAttendQuery(request.ID);
-            
-            if (attendUser == null)
+            var elapsed = DateTime.Now - attendInfo.AttendDate;
+            if(elapsed.Days >= 1)
             {
-                var cnt = await MysqlManager.Instance.InsertAttend(request.ID);
-                if (cnt != 1)
-                {
-                    Logger.ZLogError("ERROR: Wrong User ID");
-                    response.Result = ErrorCode.Attend_Fail_NotUser;
-                    return response;
-                }
-            } 
-            else
-            {
-                var memberUpdateCount = await MysqlManager.Instance.UpdateAttend(request.ID);
+                var memberUpdateCount = await MysqlManager.UpdatePlayerAttend(request.UUID);
                 if (memberUpdateCount != 1)
                 {
-                    Logger.ZLogError("ERROR: Attend Update Failed!");
+                    _logger.ZLogError("ERROR: Attend Update Failed!");
                     response.Result = ErrorCode.Attend_Fail_NotUser;
                     return response;
                 }
@@ -63,7 +48,7 @@ public class AttendController : ControllerBase
         }
         catch (Exception ex)
         {
-            Logger.ZLogError(ex.ToString());
+            _logger.ZLogError(ex.ToString());
             response.Result = ErrorCode.Attend_Fail_Exception;
             return response;
         }
@@ -73,6 +58,7 @@ public class AttendController : ControllerBase
 public class AttendRequest
 {
     public string ID { get; set; }
+    public string UUID { get; set; }
     public string AuthToken { get; set; }
 }
 

@@ -8,5 +8,11 @@
         {
             return builder.UseMiddleware<LoggingMiddleware>();
         }
+
+        public static IApplicationBuilder UseTokenCheckMiddleware(
+            this IApplicationBuilder builder)
+        {
+            return builder.UseMiddleware<TokenCheckMiddleware>();
+        }
     }
 }

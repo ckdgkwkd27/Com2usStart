@@ -8,69 +8,56 @@ namespace com2us_start.Controllers;
 [ApiController]
 public class AttendGiftController : ControllerBase
 {
-    private readonly ILogger Logger;
-    private Int32 TestMinutesLimit;
+    private readonly ILogger _logger;
+    private readonly IConfiguration _conf;
+    private readonly Int32 _testMinutesLimit;
 
     public AttendGiftController(ILogger<AttendGiftController> logger)
     {
-        Logger = logger;
-        TestMinutesLimit = 1;
+        _logger = logger;
+        _testMinutesLimit = 1;
     }
 
     [HttpPost]
     public async Task<AttendResponse> Post(AttendRequest request)
     {
-        Logger.ZLogDebug($"[Request] ID:{request.ID}, Token:{request.AuthToken}");
-
         var response = new AttendResponse() { Result = ErrorCode.None };
 
         try
         {
-            response.Result = await RedisManager.Instance.TokenCheck(request.ID, request.AuthToken);
-            if (response.Result == ErrorCode.Token_Fail_NotAuthorized)
-            {
-                return response;
-            }
-
             //Attendance 테이블 조회해서 GiftDate가 null이거나 Time Limit을 넘었으면 선물 지급
-            var attendGiftInfo = await MysqlManager.Instance.SelectAttendQuery(request.ID);
-            if (attendGiftInfo == null)
+            var attendGiftPlayerInfo = await MysqlManager.SelectGamePlayerQuery(request.UUID);
+            if (attendGiftPlayerInfo == null)
             {
-                Logger.ZLogError("Wrong User ID");
+                _logger.ZLogError("Wrong User ID");
                 response.Result = ErrorCode.Attend_Fail_NotUser;
                 return response;
             }
             
-            TimeSpan elapsed = DateTime.Now - attendGiftInfo.GiftDate;
+            TimeSpan elapsed = DateTime.Now - attendGiftPlayerInfo.GiftDate;
 
             //현재 테스트를 위해 1분단위로 출석 가능
-            if (elapsed.Minutes > TestMinutesLimit)
+            if (elapsed.Minutes >= _testMinutesLimit)
             {
                 //출석보상 편지를 우편함으로 보낸다
                 var tbl = AttendGiftTableImpl.GiftDict;
-                Logger.ZLogInformation("{0}일차 출석 환영합니다~~ 편지 보낼게요!!", attendGiftInfo.HowLongDays);
-                Logger.ZLogInformation("출석 보상: {0}", tbl[attendGiftInfo.HowLongDays].ItemName);
+                _logger.ZLogInformation("{0}일차 출석 환영합니다~~ 편지 보낼게요!!", attendGiftPlayerInfo.HowLongDays);
+                _logger.ZLogInformation("출석 보상: {0}", tbl[attendGiftPlayerInfo.HowLongDays].ItemName);
 
-                var mailInsertCount = await MysqlManager.Instance.InsertMail(
-                    request.ID,
-                    tbl[attendGiftInfo.HowLongDays].ItemId,
-                    "운영자",
-                    Int32.Parse(tbl[attendGiftInfo.HowLongDays].Amount),
-                    attendGiftInfo.HowLongDays + "일차 출석 환영해요!",
-                    "접속 자주 해주세용");
+                var mailInsertCount = await MysqlManager.InsertAttendOperationMail(request.UUID, null, attendGiftPlayerInfo);
                 
                 if (mailInsertCount != 1)
                 {
-                    Logger.ZLogError("Mail Send Fail!");
+                    _logger.ZLogError("Mail Send Fail!");
                     response.Result = ErrorCode.Mail_Fail_CannotSend;
                     return response;
                 }
                 
                 //선물 지급 날짜 업데이트
-                var giftUpdateCount = await MysqlManager.Instance.UpdateAttend(request.ID, true);
+                var giftUpdateCount = await MysqlManager.UpdatePlayerAttend(request.UUID, true);
                 if (giftUpdateCount != 1)
                 {
-                    Logger.ZLogError("GiftDate Update Fail!");
+                    _logger.ZLogError("GiftDate Update Fail!");
                     response.Result = ErrorCode.Attend_Fail_NotUser;
                     return response;
                 }
@@ -80,7 +67,7 @@ public class AttendGiftController : ControllerBase
         }
         catch (Exception ex)
         {
-            Logger.ZLogError(ex.ToString());
+            _logger.ZLogError(ex.ToString());
             response.Result = ErrorCode.Attend_Fail_Exception;
             return response;
         }

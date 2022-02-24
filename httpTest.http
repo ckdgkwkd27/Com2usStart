@@ -3,8 +3,8 @@ POST http://localhost:7038/Join
 Content-Type: application/json
 
 {
-  "ID":"com2us",
-  "Password":"fighting"
+  "ID":"test",
+  "Password":"man"
 }
 
 ###
@@ -12,8 +12,17 @@ POST http://localhost:7038/Login
 Content-Type: application/json
 
 {
-  "ID":"com2us",
-  "Password":"fighting"
+  "ID":"test",
+  "Password":"man"
+}
+
+###
+POST http://localhost:7038/PlayerCreate
+Content-Type: application/json
+
+{
+  "ID":"test",
+  "AuthToken": "d6raj3tve4tblk08fsrxr1vwd"
 }
 
 ###
@@ -21,8 +30,9 @@ POST http://localhost:7038/DataLoad
 Content-Type: application/json
 
 {
-  "ID":"com2us",
-  "AuthToken":"mhryngts370pjthnxh7sbnkhw"
+  "ID": "test",
+  "UUID":"366046a1-0d68-4963-b0d0-23ff885f412c",
+  "AuthToken":"d6raj3tve4tblk08fsrxr1vwd"
 }
 
 ###
@@ -30,8 +40,9 @@ POST http://localhost:7038/Attend
 Content-Type: application/json
 
 {
-  "ID":"com2us",
-  "AuthToken":"mhryngts370pjthnxh7sbnkhw"
+  "ID":"test",
+  "UUID":"366046a1-0d68-4963-b0d0-23ff885f412c",
+  "AuthToken":"d6raj3tve4tblk08fsrxr1vwd"
 }
 
 ###
@@ -39,8 +50,9 @@ POST http://localhost:7038/AttendGift
 Content-Type: application/json
 
 {
-  "ID":"com2us",
-  "AuthToken":"mhryngts370pjthnxh7sbnkhw"
+  "ID":"test",
+  "UUID":"366046a1-0d68-4963-b0d0-23ff885f412c",
+  "AuthToken":"d6raj3tve4tblk08fsrxr1vwd"
 }
 
 ###
@@ -48,6 +60,27 @@ POST  http://localhost:7038/Mail
 Content-Type: application/json
 
 {
-  "ID": "com2us",
-  "AuthToken": "mhryngts370pjthnxh7sbnkhw"
+  "ID":"test",
+  "UUID": "366046a1-0d68-4963-b0d0-23ff885f412c",
+  "AuthToken": "d6raj3tve4tblk08fsrxr1vwd"
+}
+
+###
+POST  http://localhost:7038/ReceiveMail
+Content-Type: application/json
+
+{
+  "ID":"test",
+  "UUID": "366046a1-0d68-4963-b0d0-23ff885f412c",
+  "AuthToken": "d6raj3tve4tblk08fsrxr1vwd"
+}
+
+###
+POST  http://localhost:7038/Inventory
+Content-Type: application/json
+
+{
+  "ID":"test",
+  "UUID": "366046a1-0d68-4963-b0d0-23ff885f412c",
+  "AuthToken": "d6raj3tve4tblk08fsrxr1vwd"
 }

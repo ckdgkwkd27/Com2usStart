@@ -7,32 +7,25 @@ namespace com2us_start.Controllers;
 [ApiController]
 public class MailController : ControllerBase
 {
-    private readonly ILogger Logger;
+    private readonly ILogger _logger;
+    private readonly IConfiguration _conf;
 
     public MailController(ILogger<MailController> logger)
     {
-        Logger = logger;
+        _logger = logger;
     }
 
     [HttpPost]
     public async Task<MailResponse> Post(MailRequest request)
     {
-        Logger.ZLogDebug($"[Request] ID:{request.ID}, Token:{request.AuthToken}");
-
         var response = new MailResponse() { Result = ErrorCode.None };
 
         try
         {
-            response.Result = await RedisManager.Instance.TokenCheck(request.ID, request.AuthToken);
-            if (response.Result == ErrorCode.Token_Fail_NotAuthorized)
-            {
-                return response;
-            }
-
-            var mailList = await MysqlManager.Instance.SelectMultipleMailQuery(request.ID);
+            var mailList = await MysqlManager.SelectMultipleMailQuery(request.UUID);
             if (mailList.Count == 0)
             {
-                Logger.ZLogError("Mail Is Empty!");
+                _logger.ZLogError("Mail Is Empty!");
                 response.RecvMail = null;
                 response.Result = ErrorCode.Mail_Fail_Empty;
                 return response;
@@ -43,7 +36,7 @@ public class MailController : ControllerBase
         }
         catch (Exception ex)
         {
-            Logger.ZLogError(ex.ToString());
+            _logger.ZLogError(ex.ToString());
             response.RecvMail = new List<Mail>();
             response.Result = ErrorCode.Mail_Fail_Exception;
             return response;
@@ -54,6 +47,7 @@ public class MailController : ControllerBase
 public class MailRequest
 {
     public string ID { get; set; }
+    public string UUID { get; set; }
     public string AuthToken { get; set; }
 }
 

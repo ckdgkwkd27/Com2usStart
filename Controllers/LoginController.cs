@@ -10,12 +10,13 @@ namespace com2us_start.Controllers;
 [ApiController]
 public class LoginController : ControllerBase
 {
-    private readonly ILogger Logger;
+    private readonly ILogger _logger;
+    private readonly IConfiguration _conf;
     private IMemoryCache MemoryCache;
 
     public LoginController(ILogger<LoginController> logger, IMemoryCache memoryCache)
     {
-        Logger = logger;
+        _logger = logger;
         MemoryCache = memoryCache; 
     }
 
@@ -23,13 +24,13 @@ public class LoginController : ControllerBase
     public async Task<LoginResponse> Post(LoginRequest request)
     {
         //ZLogger 적용
-        Logger.ZLogInformation($"[Request Login] ID:{request.ID}, PW:{request.Password}");
+        _logger.ZLogInformation($"[Request Login] ID:{request.ID}, PW:{request.Password}");
 
         var response = new LoginResponse() { Result = ErrorCode.None };
         
         try
         {
-            var memberInfo = await MysqlManager.Instance.SelectMemberQuery(request.ID);
+            var memberInfo = await MysqlManager.SelectMemberQuery(request.ID);
             if (null == memberInfo)
             {
                 response.Result = ErrorCode.Login_Fail_NotUser;
@@ -45,7 +46,7 @@ public class LoginController : ControllerBase
         }
         catch (Exception ex)
         {
-            Logger.ZLogError(ex.ToString());
+            _logger.ZLogError(ex.ToString());
             response.Result = ErrorCode.Login_Fail_Exception;
             return response;
         }
@@ -58,7 +59,7 @@ public class LoginController : ControllerBase
 
         response.AuthToken = tokenValue;
 
-        Logger.ZLogInformation($"Login Success!! Hi {request.ID}");
+        _logger.ZLogInformation($"Login Success!! Hi {request.ID}");
         return response;
     }
 }

@@ -7,7 +7,6 @@ public enum ErrorCode : Int32
     
     Join_Fail_Duplicate = 11,
     Join_Fail_Exception = 12,
-    Join_Fail_PlayerFailed = 13,
 
     Login_Fail_NotUser = 21,
     Login_Fail_Exception = 22,
@@ -21,5 +20,16 @@ public enum ErrorCode : Int32
     Mail_Fail_Empty = 51,
     Mail_Fail_Exception = 52,
     Mail_Fail_CannotSend = 53,
+    
+    Recv_Fail_NotUser = 61,
+    Recv_Fail_Exception = 62,
+    Recv_Fail_InvalidRecv = 63,
+    
+    Player_Fail_NotUser = 71,
+    Player_Fail_Exception = 72,
+    Player_Fail_Insertion = 73,
+
+    Inventory_Fail_Empty = 81,
+    Inventory_Fail_Exception = 82,
 }
 
