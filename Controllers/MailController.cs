@@ -9,10 +9,13 @@ public class MailController : ControllerBase
 {
     private readonly ILogger _logger;
     private readonly IConfiguration _conf;
+    private readonly IRealDbConnector _realDbConnector;
 
-    public MailController(ILogger<MailController> logger)
+    public MailController(ILogger<MailController> logger, IConfiguration conf, IRealDbConnector realDbConnector)
     {
         _logger = logger;
+        _conf = conf;
+        _realDbConnector = realDbConnector;
     }
 
     [HttpPost]
@@ -22,7 +25,10 @@ public class MailController : ControllerBase
 
         try
         {
-            var mailList = await MysqlManager.SelectMultipleMailQuery(request.UUID);
+            using MysqlManager manager = new MysqlManager(_conf, _realDbConnector);
+            await manager.GetDbConnection();
+            
+            var mailList = await manager.SelectMultipleMailQuery(request.UUID);
             if (mailList.Count == 0)
             {
                 _logger.ZLogError("Mail Is Empty!");

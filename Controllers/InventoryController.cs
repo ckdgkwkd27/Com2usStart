@@ -9,12 +9,13 @@ public class InventoryController : ControllerBase
 {
     private readonly ILogger _logger;
     private readonly IConfiguration _conf;
-    private List<InventoryItem> _inventoryItems;
+    private readonly IRealDbConnector _realDbConnector;
 
-    public InventoryController(ILogger<InventoryController> logger)
+    public InventoryController(ILogger<InventoryController> logger, IConfiguration conf, IRealDbConnector realDbConnector)
     {
         _logger = logger;
-        _inventoryItems = new List<InventoryItem>();
+        _conf = conf;
+        _realDbConnector = realDbConnector;
     }
 
     [HttpPost]
@@ -24,7 +25,10 @@ public class InventoryController : ControllerBase
 
         try
         {
-            var invenList = await MysqlManager.SelectMultipleInventoryQuery(request.UUID);
+            using MysqlManager manager = new MysqlManager(_conf,_realDbConnector);
+            await manager.GetDbConnection();
+            
+            var invenList = await manager.SelectMultipleInventoryQuery(request.UUID);
             if (invenList.Count == 0)
             {
                 _logger.ZLogError("Inventory is Empty!");
@@ -33,7 +37,7 @@ public class InventoryController : ControllerBase
             }
             
             //item, Inventory 테이블간 Join
-            var itemList = await MysqlManager.SelectAllInventoryItems(request.UUID);
+            var itemList = await manager.SelectAllInventoryItems(request.UUID);
             response.ItemList = itemList;
             return response;
         }

@@ -12,11 +12,14 @@ public class LoginController : ControllerBase
 {
     private readonly ILogger _logger;
     private readonly IConfiguration _conf;
+    private readonly IRealDbConnector _realDbConnector;
     private IMemoryCache MemoryCache;
 
-    public LoginController(ILogger<LoginController> logger, IMemoryCache memoryCache)
+    public LoginController(ILogger<LoginController> logger, IConfiguration conf, IRealDbConnector realDbConnector, IMemoryCache memoryCache)
     {
         _logger = logger;
+        _conf = conf;
+        _realDbConnector = realDbConnector;
         MemoryCache = memoryCache; 
     }
 
@@ -30,7 +33,10 @@ public class LoginController : ControllerBase
         
         try
         {
-            var memberInfo = await MysqlManager.SelectMemberQuery(request.ID);
+            using MysqlManager manager = new MysqlManager(_conf, _realDbConnector);
+            await manager.GetDbConnection();
+            
+            var memberInfo = await manager.SelectMemberQuery(request.ID);
             if (null == memberInfo)
             {
                 response.Result = ErrorCode.Login_Fail_NotUser;

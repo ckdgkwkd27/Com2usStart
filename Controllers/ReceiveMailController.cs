@@ -9,10 +9,13 @@ public class ReceiveMailController : ControllerBase
 {
     private readonly ILogger _logger;
     private readonly IConfiguration _conf;
+    private readonly IRealDbConnector _realDbConnector;
 
-    public ReceiveMailController(ILogger<ReceiveMailController> logger)
+    public ReceiveMailController(ILogger<ReceiveMailController> logger, IConfiguration conf, IRealDbConnector realDbConnector)
     {
         _logger = logger;
+        _conf = conf;
+        _realDbConnector = realDbConnector;
     }
 
     [HttpPost]
@@ -22,7 +25,10 @@ public class ReceiveMailController : ControllerBase
         
         try
         {
-            var mailList = await MysqlManager.SelectMultipleMailQuery(request.UUID);
+            using MysqlManager manager = new MysqlManager(_conf, _realDbConnector);
+            await manager.GetDbConnection();
+            
+            var mailList = await manager.SelectMultipleMailQuery(request.UUID);
             if (mailList.Count == 0)
             {
                 _logger.ZLogError("Mail Is Empty!");
@@ -32,7 +38,7 @@ public class ReceiveMailController : ControllerBase
 
             foreach (var mail in mailList)
             {
-                var insertCount = await MysqlManager.InsertItemToInventory(mail.UUID, mail.ItemID, mail.Amount);
+                var insertCount = await manager.InsertItemToInventory(mail.UUID, mail.ItemID, mail.Amount);
                 if (insertCount != 1)
                 {
                     _logger.ZLogError("Wrong Player ID");
@@ -41,7 +47,7 @@ public class ReceiveMailController : ControllerBase
                 }
             }
 
-            var delCount = await MysqlManager.DeleteMails(request.UUID);
+            var delCount = await manager.DeleteMails(request.UUID);
             if (delCount == 0)
             {
                 _logger.ZLogError("Invalid Item Receive");

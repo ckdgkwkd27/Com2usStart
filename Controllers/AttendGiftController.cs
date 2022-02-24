@@ -10,11 +10,14 @@ public class AttendGiftController : ControllerBase
 {
     private readonly ILogger _logger;
     private readonly IConfiguration _conf;
+    private readonly IRealDbConnector _realDbConnector;
     private readonly Int32 _testMinutesLimit;
 
-    public AttendGiftController(ILogger<AttendGiftController> logger)
+    public AttendGiftController(ILogger<AttendGiftController> logger, IConfiguration conf, IRealDbConnector realDbConnector)
     {
         _logger = logger;
+        _conf = conf;
+        _realDbConnector = realDbConnector;
         _testMinutesLimit = 1;
     }
 
@@ -26,7 +29,10 @@ public class AttendGiftController : ControllerBase
         try
         {
             //Attendance 테이블 조회해서 GiftDate가 null이거나 Time Limit을 넘었으면 선물 지급
-            var attendGiftPlayerInfo = await MysqlManager.SelectGamePlayerQuery(request.UUID);
+            using MysqlManager manager = new MysqlManager(_conf, _realDbConnector);
+            await manager.GetDbConnection();
+            
+            var attendGiftPlayerInfo = await manager.SelectGamePlayerQuery(request.UUID);
             if (attendGiftPlayerInfo == null)
             {
                 _logger.ZLogError("Wrong User ID");
@@ -44,7 +50,7 @@ public class AttendGiftController : ControllerBase
                 _logger.ZLogInformation("{0}일차 출석 환영합니다~~ 편지 보낼게요!!", attendGiftPlayerInfo.HowLongDays);
                 _logger.ZLogInformation("출석 보상: {0}", tbl[attendGiftPlayerInfo.HowLongDays].ItemName);
 
-                var mailInsertCount = await MysqlManager.InsertAttendOperationMail(request.UUID, null, attendGiftPlayerInfo);
+                var mailInsertCount = await manager.InsertAttendOperationMail(request.UUID, null, attendGiftPlayerInfo);
                 
                 if (mailInsertCount != 1)
                 {
@@ -54,7 +60,7 @@ public class AttendGiftController : ControllerBase
                 }
                 
                 //선물 지급 날짜 업데이트
-                var giftUpdateCount = await MysqlManager.UpdatePlayerAttend(request.UUID, true);
+                var giftUpdateCount = await manager.UpdatePlayerAttend(request.UUID, true);
                 if (giftUpdateCount != 1)
                 {
                     _logger.ZLogError("GiftDate Update Fail!");

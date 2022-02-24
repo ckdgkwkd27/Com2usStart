@@ -10,10 +10,13 @@ public class DataLoadController : ControllerBase
 {
     private readonly ILogger _logger;
     private readonly IConfiguration _conf;
+    private readonly IRealDbConnector _realDbConnector;
 
-    public DataLoadController(ILogger<DataLoadController> logger)
+    public DataLoadController(ILogger<DataLoadController> logger, IConfiguration conf, IRealDbConnector realDbConnector)
     {
         _logger = logger;
+        _conf = conf;
+        _realDbConnector = realDbConnector;
     }
 
     [HttpPost]
@@ -24,7 +27,10 @@ public class DataLoadController : ControllerBase
         try
         {
             //DB에서 체크
-            var playerInfo = await MysqlManager.SelectGamePlayerQuery(request.UUID);
+            using MysqlManager manager = new MysqlManager(_conf, _realDbConnector);
+            await manager.GetDbConnection();
+            
+            var playerInfo = await manager.SelectGamePlayerQuery(request.UUID);
             if (null == playerInfo)
             {
                 response.Result = ErrorCode.Load_Fail_NotUser;

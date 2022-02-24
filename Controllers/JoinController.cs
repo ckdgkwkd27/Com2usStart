@@ -11,11 +11,13 @@ public class JoinController : ControllerBase
 {
     private readonly ILogger _logger;
     private readonly IConfiguration _conf;
+    private readonly IRealDbConnector _realDbConnector;
 
-    public JoinController(ILogger<JoinController> logger)
+    public JoinController(ILogger<JoinController> logger, IConfiguration conf, IRealDbConnector realDbConnector)
     {
         _logger = logger;
-        //_conf = conf;
+        _conf = conf;
+        _realDbConnector = realDbConnector;
     }
     
     [HttpPost]
@@ -31,7 +33,10 @@ public class JoinController : ControllerBase
         
         try
         {
-            var accountInsertCount =  await MysqlManager.InsertAccountQuery(request.ID, hashingPassword, saltValue);
+            using MysqlManager manager = new MysqlManager(_conf,_realDbConnector);
+            await manager.GetDbConnection();
+            
+            var accountInsertCount =  await manager.InsertAccountQuery(request.ID, hashingPassword, saltValue);
             if (accountInsertCount != 1)
             {
                 _logger.ZLogError("ERROR: Account Duplicate");

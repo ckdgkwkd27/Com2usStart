@@ -10,11 +10,14 @@ public class PlayerCreateController : ControllerBase
 {
     private readonly ILogger _logger;
     private readonly IConfiguration _conf;
+    private readonly IRealDbConnector _realDbConnector;
     private readonly string uuid;
 
-    public PlayerCreateController(ILogger<PlayerCreateController> logger)
+    public PlayerCreateController(ILogger<PlayerCreateController> logger, IConfiguration conf, IRealDbConnector realDbConnector)
     {
         _logger = logger;
+        _conf = conf;
+        _realDbConnector = realDbConnector;
         uuid = Guid.NewGuid().ToString();
     }
 
@@ -25,7 +28,10 @@ public class PlayerCreateController : ControllerBase
         
         try
         {
-            var memberInfo = await MysqlManager.SelectMemberQuery(request.ID);
+            using MysqlManager manager = new MysqlManager(_conf,_realDbConnector);
+            await manager.GetDbConnection();
+            
+            var memberInfo = await manager.SelectMemberQuery(request.ID);
             if (null == memberInfo)
             {
                 response.Result = ErrorCode.Player_Fail_NotUser;
@@ -33,14 +39,7 @@ public class PlayerCreateController : ControllerBase
             }
 
             //Player Data 생성
-            var playerInsertCount = await MysqlManager.InsertPlayer(
-                uuid: uuid,
-                id: request.ID,
-                level: 1,
-                exp: 0,
-                gameMoney: 0
-            );
-
+            var playerInsertCount = await manager.InsertPlayer(uuid, request.ID,1, 0, gameMoney: 0);
             if (playerInsertCount != 1)
             {
                 _logger.ZLogError("ERROR: Player Create Failed!");

@@ -22,8 +22,8 @@ public class TokenCheckMiddleware
             && httpContext.Request.Path != "/Login")
         {
             StreamReader bodystream = new StreamReader(httpContext.Request.Body, Encoding.Default);
-            //await도 고려
-            var body = bodystream.ReadToEndAsync().Result;
+
+            var body = await bodystream.ReadToEndAsync();
             var obj = (JObject)JsonConvert.DeserializeObject(body);
             
             var Id = (string)obj["ID"];

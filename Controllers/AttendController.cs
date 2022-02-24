@@ -10,11 +10,14 @@ public class AttendController : ControllerBase
 {
     private readonly ILogger _logger;
     private readonly IConfiguration _conf;
+    private readonly IRealDbConnector _realDbConnector;
 
-    public AttendController(ILogger<AttendController> logger)
+    //컨트롤러에 MysqlManager 정보 주입 
+    public AttendController(ILogger<AttendController> logger, IConfiguration conf, IRealDbConnector realDbConnector)
     {
         _logger = logger;
-        
+        _conf = conf;
+        _realDbConnector = realDbConnector;
     }
 
     [HttpPost]
@@ -24,7 +27,10 @@ public class AttendController : ControllerBase
 
         try
         {
-            var attendInfo = await MysqlManager.SelectGamePlayerQuery(request.UUID);
+            using MysqlManager manager = new MysqlManager(_conf, _realDbConnector);
+            await manager.GetDbConnection();
+            
+            var attendInfo = await manager.SelectGamePlayerQuery(request.UUID);
             if (attendInfo == null)
             {
                 _logger.ZLogError("Wrong User ID");
@@ -35,7 +41,7 @@ public class AttendController : ControllerBase
             var elapsed = DateTime.Now - attendInfo.AttendDate;
             if(elapsed.Days >= 1)
             {
-                var memberUpdateCount = await MysqlManager.UpdatePlayerAttend(request.UUID);
+                var memberUpdateCount = await manager.UpdatePlayerAttend(request.UUID);
                 if (memberUpdateCount != 1)
                 {
                     _logger.ZLogError("ERROR: Attend Update Failed!");
