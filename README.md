@@ -34,7 +34,7 @@ http://localhost:7038/Inventory (인벤토리) ID, UUID, AuthToken 값을 전달
 - GamePlayer: 사용자의 인게임 정보가 저장됩니다.
 - Robotmon: 로봇몬들의 정보가 저장됩니다.
 - PlayerRobotmon: 플레이어가 잡은 로봇몬의 정보들이 저장됩니다.
-- item: 아이템 관련 정보들이 저장됩니다.
+- Item: 아이템 관련 정보들이 저장됩니다.
 - Mail: 발송된 메일들에 대한 정보가 저장됩니다.
 - Inventory: 사용자의 인벤토리 정보가 출력됩니다.
 <br/>
