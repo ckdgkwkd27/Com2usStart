@@ -25,7 +25,7 @@ http://localhost:7038/Inventory (인벤토리) ID, UUID, AuthToken 값을 전달
 <br/>
 
 ### 로봇몬고 ER-Diagram
-![ERD](https://user-images.githubusercontent.com/30414979/155468926-a11f5fbe-a3a1-4073-958b-6f687be3ce62.png)
+![ERD](https://user-images.githubusercontent.com/30414979/155471030-5fd43361-61cb-4eb6-ba0f-2b8bb16def21.png)
 
 
 <br/><br/>
