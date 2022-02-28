@@ -2,8 +2,6 @@
 
 public class ReinforceInfoTableImpl : ICsvTableBase
 {
-    //일단 출력하고 이후에 테이블 까서 db에 넣자
-
     public static List<RobotmonUpgrade> sRobotmonUpgradeList;
     private IRealDbConnector _realDbConnector;
 
