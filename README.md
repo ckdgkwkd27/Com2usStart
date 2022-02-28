@@ -1,4 +1,4 @@
-## 메일수령, 인벤토리 구현 및 전체적인 코드,DB 구조개선(22.02.24)
+## 메일수령, 인벤토리 구현 및 기획테이블 파싱,db저장 기능(22.02.28)
 
 ### 사용법
 ```
@@ -54,5 +54,9 @@ http://localhost:7038/Inventory (인벤토리) ID, UUID, AuthToken 값을 전달
 - 컨트롤러 부분 의존성 주입(DI) 추가
 - MysqlManager의 Connection부분을 따로빼서(RealDbConnector) DI로 구현. MysqlManager는 쿼리처리만 담당
 - MysqlManager에서 Dispose 패턴 구현. Dispose시 Connection Close처리 
+
+### 추가된 내용(22.02.28)
+- 로봇몬 정보, 진화 정보, 강화 정보를 저장하는 테이블(csv) 추가
+- 해당 테이블들을 파싱하고 db에 저장하는 클래스(--Impl.cs)들 추가
 <br/>
 😀 감사합니다 😀      
