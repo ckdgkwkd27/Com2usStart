@@ -1,4 +1,5 @@
-﻿using MySqlConnector;
+﻿using System.Data;
+using MySqlConnector;
 
 namespace com2us_start;
 
@@ -14,6 +15,10 @@ public class RealDbConnector : IRealDbConnector
 
     public async Task Disconnect()
     {
+        /*if (connection.State == ConnectionState.Closed)
+        {
+            return;
+        }*/
         await connection.CloseAsync();
     }
 }

@@ -11,7 +11,7 @@ public class AttendGiftTableImpl : ICsvTableBase
         GiftDict = new Dictionary<Int32, AttendGiftTableMember>();
     }
 
-    public bool Execute(string filename)
+    public async Task<bool> ExecuteAsync(string filename, IConfiguration conf)
     {
         var tableList = CsvParser.Instance.Parse(filename);
         if (tableList.Count < 1)
@@ -33,20 +33,6 @@ public class AttendGiftTableImpl : ICsvTableBase
         }
         
         return true;
-    }
-
-    public void Load()
-    { 
-        foreach (var tbl in GiftDict)
-        {
-            //Console.Write(tbl.Days + " ");
-            Console.Write(tbl.Key + " ");
-            Console.Write(tbl.Value.ItemName + " ");
-            Console.Write(tbl.Value.ItemId + " ");
-            Console.Write(tbl.Value.ItemType + " ");
-            Console.Write(tbl.Value.Amount + " ");
-            Console.Write("\n");
-        }
     }
 }
 

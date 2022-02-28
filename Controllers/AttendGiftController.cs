@@ -30,7 +30,6 @@ public class AttendGiftController : ControllerBase
         {
             //Attendance 테이블 조회해서 GiftDate가 null이거나 Time Limit을 넘었으면 선물 지급
             using MysqlManager manager = new MysqlManager(_conf, _realDbConnector);
-            await manager.GetDbConnection();
             
             var attendGiftPlayerInfo = await manager.SelectGamePlayerQuery(request.UUID);
             if (attendGiftPlayerInfo == null)

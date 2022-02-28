@@ -28,6 +28,6 @@ app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
 IConfiguration configuration = app.Configuration;
 
 RedisManager.Instance.Init(configuration);
-CsvTableLoader.Instance.Load();
+CsvTableLoader.Instance.Init(configuration);
 
 app.Run();

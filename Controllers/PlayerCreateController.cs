@@ -29,7 +29,6 @@ public class PlayerCreateController : ControllerBase
         try
         {
             using MysqlManager manager = new MysqlManager(_conf,_realDbConnector);
-            await manager.GetDbConnection();
             
             var memberInfo = await manager.SelectMemberQuery(request.ID);
             if (null == memberInfo)

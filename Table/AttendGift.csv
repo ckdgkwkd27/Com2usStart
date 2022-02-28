@@ -5,4 +5,4 @@
 4,보물지도,id_treasuremap,TYPE_MAP,1
 5,가챠 쿠폰,id_gotchacoupon,TYPE_CONSUMABLE,5
 6,부활석,id_revive,TYPE_GOODS,10
-7,돈,id_money,TYPE_MONEY,1000000
+7,전설뽑기 쿠폰,id_legendgatcha,TYPE_CONSUMABLE,2

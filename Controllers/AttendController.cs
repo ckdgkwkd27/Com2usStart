@@ -28,7 +28,6 @@ public class AttendController : ControllerBase
         try
         {
             using MysqlManager manager = new MysqlManager(_conf, _realDbConnector);
-            await manager.GetDbConnection();
             
             var attendInfo = await manager.SelectGamePlayerQuery(request.UUID);
             if (attendInfo == null)

@@ -34,7 +34,6 @@ public class JoinController : ControllerBase
         try
         {
             using MysqlManager manager = new MysqlManager(_conf,_realDbConnector);
-            await manager.GetDbConnection();
             
             var accountInsertCount =  await manager.InsertAccountQuery(request.ID, hashingPassword, saltValue);
             if (accountInsertCount != 1)

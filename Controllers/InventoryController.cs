@@ -26,7 +26,6 @@ public class InventoryController : ControllerBase
         try
         {
             using MysqlManager manager = new MysqlManager(_conf,_realDbConnector);
-            await manager.GetDbConnection();
             
             var invenList = await manager.SelectMultipleInventoryQuery(request.UUID);
             if (invenList.Count == 0)

@@ -28,7 +28,6 @@ public class DataLoadController : ControllerBase
         {
             //DB에서 체크
             using MysqlManager manager = new MysqlManager(_conf, _realDbConnector);
-            await manager.GetDbConnection();
             
             var playerInfo = await manager.SelectGamePlayerQuery(request.UUID);
             if (null == playerInfo)

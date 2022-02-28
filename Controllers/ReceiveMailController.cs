@@ -26,7 +26,6 @@ public class ReceiveMailController : ControllerBase
         try
         {
             using MysqlManager manager = new MysqlManager(_conf, _realDbConnector);
-            await manager.GetDbConnection();
             
             var mailList = await manager.SelectMultipleMailQuery(request.UUID);
             if (mailList.Count == 0)
