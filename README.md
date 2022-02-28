@@ -55,6 +55,7 @@ http://localhost:7038/Inventory (인벤토리) ID, UUID, AuthToken 값을 전달
 - 컨트롤러 부분 의존성 주입(DI) 추가
 - MysqlManager의 Connection부분을 따로빼서(RealDbConnector) DI로 구현. MysqlManager는 쿼리처리만 담당
 - MysqlManager에서 Dispose 패턴 구현. Dispose시 Connection Close처리 
+<br/>
 
 ### 추가된 내용(22.02.28)
 - 로봇몬 정보, 진화 정보, 강화 정보를 저장하는 테이블(csv) 추가
