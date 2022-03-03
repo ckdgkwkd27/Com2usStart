@@ -14,5 +14,5 @@ public class Mail
     public Int32 Money { get; set; }
     public string ItemName { get; set; }
     public string ItemType { get; set; }
-    private bool IsDeleted { get; set; } // 쿼리 바녕ㅇ
+    private bool IsDeleted { get; set; } 
 }
