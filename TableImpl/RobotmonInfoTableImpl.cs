@@ -2,7 +2,6 @@
 
 public class RobotmonInfoTableImpl : ICsvTableBase
 {
-    //이후에 지우자
     public static List<RobotMon> sRobotmonList;
     private IRealDbConnector _realDbConnector;
 

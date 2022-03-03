@@ -22,7 +22,7 @@ Content-Type: application/json
 
 {
   "ID":"test",
-  "AuthToken": "h662dej5of4pcsjr4n6ykx0td"
+  "AuthToken": "cbf9g04tkyru2vb1b966ac8hb"
 }
 
 ###
@@ -31,8 +31,8 @@ Content-Type: application/json
 
 {
   "ID": "test",
-  "UUID":"03b18ce5-1144-4284-80c0-ed3b72106239",
-  "AuthToken":"h662dej5of4pcsjr4n6ykx0td"
+  "PlayerID": "a75fc0d3-bb50-4a4e-8835-12ed7c9fefdf",
+  "AuthToken":"cbf9g04tkyru2vb1b966ac8hb"
 }
 
 ###
@@ -41,8 +41,8 @@ Content-Type: application/json
 
 {
   "ID":"test",
-  "UUID":"03b18ce5-1144-4284-80c0-ed3b72106239",
-  "AuthToken":"h662dej5of4pcsjr4n6ykx0td"
+  "PlayerID":"a75fc0d3-bb50-4a4e-8835-12ed7c9fefdf",
+  "AuthToken":"cbf9g04tkyru2vb1b966ac8hb"
 }
 
 ###
@@ -51,8 +51,8 @@ Content-Type: application/json
 
 {
   "ID":"test",
-  "UUID":"03b18ce5-1144-4284-80c0-ed3b72106239",
-  "AuthToken":"h662dej5of4pcsjr4n6ykx0td"
+  "PlayerID":"a75fc0d3-bb50-4a4e-8835-12ed7c9fefdf",
+  "AuthToken":"cbf9g04tkyru2vb1b966ac8hb"
 }
 
 ###
@@ -61,8 +61,8 @@ Content-Type: application/json
 
 {
   "ID":"test",
-  "UUID": "03b18ce5-1144-4284-80c0-ed3b72106239",
-  "AuthToken": "h662dej5of4pcsjr4n6ykx0td"
+  "PlayerID": "a75fc0d3-bb50-4a4e-8835-12ed7c9fefdf",
+  "AuthToken": "cbf9g04tkyru2vb1b966ac8hb"
 }
 
 ###
@@ -71,8 +71,8 @@ Content-Type: application/json
 
 {
   "ID":"test",
-  "UUID": "03b18ce5-1144-4284-80c0-ed3b72106239",
-  "AuthToken": "h662dej5of4pcsjr4n6ykx0td"
+  "PlayerID": "a75fc0d3-bb50-4a4e-8835-12ed7c9fefdf",
+  "AuthToken": "cbf9g04tkyru2vb1b966ac8hb"
 }
 
 ###
@@ -81,6 +81,6 @@ Content-Type: application/json
 
 {
   "ID":"test",
-  "UUID": "03b18ce5-1144-4284-80c0-ed3b72106239",
-  "AuthToken": "h662dej5of4pcsjr4n6ykx0td"
+  "PlayerID": "a75fc0d3-bb50-4a4e-8835-12ed7c9fefdf",
+  "AuthToken": "cbf9g04tkyru2vb1b966ac8hb"
 }

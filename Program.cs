@@ -15,19 +15,21 @@ builder.Logging.AddZLoggerConsole();
 
 //AddScoped: 단일 요청에서 공유하고 다른 요청에선 새 인스턴스 생성
 builder.Services.AddScoped<IRealDbConnector, RealDbConnector>();
+builder.Services.AddScoped<IRealRedisConnector, RealRedisConnector>();
 
 
 var app = builder.Build();
 
 app.UseRouting();
-app.UseLoggingMiddleware();
-app.UseTokenCheckMiddleware();
+
+//임시로 미들웨어 껐음
+//app.UseLoggingMiddleware();
+//app.UseTokenCheckMiddleware();
 
 app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
 
 IConfiguration configuration = app.Configuration;
 
-RedisManager.Instance.Init(configuration);
-CsvTableLoader.Instance.Init(configuration);
+await CsvTableLoader.Instance.Init(configuration);
 
 app.Run();

@@ -2,7 +2,7 @@
 
 public class GamePlayer
 {
-    public string UUID { get; set; }
+    public string PlayerID { get; set; }
     public string ID { get; set; }
     public Int32 Level { get; set; }
     public Int32 Exp { get; set; }

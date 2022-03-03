@@ -31,7 +31,7 @@ public class AttendGiftController : ControllerBase
             //Attendance 테이블 조회해서 GiftDate가 null이거나 Time Limit을 넘었으면 선물 지급
             using MysqlManager manager = new MysqlManager(_conf, _realDbConnector);
             
-            var attendGiftPlayerInfo = await manager.SelectGamePlayerQuery(request.UUID);
+            var attendGiftPlayerInfo = await manager.SelectGamePlayerQuery(request.PlayerID);
             if (attendGiftPlayerInfo == null)
             {
                 _logger.ZLogError("Wrong User ID");
@@ -49,7 +49,7 @@ public class AttendGiftController : ControllerBase
                 _logger.ZLogInformation("{0}일차 출석 환영합니다~~ 편지 보낼게요!!", attendGiftPlayerInfo.HowLongDays);
                 _logger.ZLogInformation("출석 보상: {0}", tbl[attendGiftPlayerInfo.HowLongDays].ItemName);
 
-                var mailInsertCount = await manager.InsertAttendOperationMail(request.UUID, null, attendGiftPlayerInfo);
+                var mailInsertCount = await manager.InsertAttendOperationMail(request.PlayerID, null, attendGiftPlayerInfo);
                 
                 if (mailInsertCount != 1)
                 {
@@ -59,7 +59,7 @@ public class AttendGiftController : ControllerBase
                 }
                 
                 //선물 지급 날짜 업데이트
-                var giftUpdateCount = await manager.UpdatePlayerAttend(request.UUID, true);
+                var giftUpdateCount = await manager.UpdatePlayerAttend(request.PlayerID, true);
                 if (giftUpdateCount != 1)
                 {
                     _logger.ZLogError("GiftDate Update Fail!");

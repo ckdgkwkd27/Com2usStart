@@ -11,14 +11,14 @@ public class PlayerCreateController : ControllerBase
     private readonly ILogger _logger;
     private readonly IConfiguration _conf;
     private readonly IRealDbConnector _realDbConnector;
-    private readonly string uuid;
+    private readonly string playerId;
 
     public PlayerCreateController(ILogger<PlayerCreateController> logger, IConfiguration conf, IRealDbConnector realDbConnector)
     {
         _logger = logger;
         _conf = conf;
         _realDbConnector = realDbConnector;
-        uuid = Guid.NewGuid().ToString();
+        playerId = Guid.NewGuid().ToString();
     }
 
     [HttpPost]
@@ -38,7 +38,7 @@ public class PlayerCreateController : ControllerBase
             }
 
             //Player Data 생성
-            var playerInsertCount = await manager.InsertPlayer(uuid, request.ID,1, 0, gameMoney: 0);
+            var playerInsertCount = await manager.InsertPlayer(playerId, request.ID,1, 0, gameMoney: 0);
             if (playerInsertCount != 1)
             {
                 _logger.ZLogError("ERROR: Player Create Failed!");
@@ -53,8 +53,8 @@ public class PlayerCreateController : ControllerBase
             return response;
         }
         
-        _logger.ZLogInformation($"Character Create Success!! {uuid}");
-        response.UUID = uuid;
+        _logger.ZLogInformation($"Character Create Success!! {playerId}");
+        response.PlayerID = playerId;
         return response;
     }
 }
@@ -67,6 +67,6 @@ public class PlayerCreateRequest
 
 public class PlayerCreateResponse
 {
-    public string UUID { get; set; }
+    public string PlayerID { get; set; }
     public ErrorCode Result { get; set; }
 }

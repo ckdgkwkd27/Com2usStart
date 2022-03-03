@@ -13,14 +13,15 @@ public class LoginController : ControllerBase
     private readonly ILogger _logger;
     private readonly IConfiguration _conf;
     private readonly IRealDbConnector _realDbConnector;
-    private IMemoryCache MemoryCache;
+    private readonly IRealRedisConnector _realRedisConnector;
 
-    public LoginController(ILogger<LoginController> logger, IConfiguration conf, IRealDbConnector realDbConnector, IMemoryCache memoryCache)
+    public LoginController(ILogger<LoginController> logger, IConfiguration conf, IRealDbConnector realDbConnector, 
+        IRealRedisConnector realRedisConnector)
     {
         _logger = logger;
         _conf = conf;
         _realDbConnector = realDbConnector;
-        MemoryCache = memoryCache; 
+        _realRedisConnector = realRedisConnector;
     }
 
     [HttpPost]
@@ -57,9 +58,10 @@ public class LoginController : ControllerBase
         }
         
         //유효기간 하루
-        string tokenValue = RedisManager.Instance.AuthToken();
+        using RedisManager redisManager = new RedisManager(_conf, _realRedisConnector);
+        string tokenValue = redisManager.AuthToken();
         var defaultExpiry = TimeSpan.FromDays(1);
-        var redisId = new RedisString<string>(RedisManager.Instance.RedisConn, request.ID, defaultExpiry);
+        var redisId = new RedisString<string>(RedisManager._realRedisConnector.GetConnector(), request.ID, defaultExpiry);
         await redisId.SetAsync(tokenValue);
 
         response.AuthToken = tokenValue;

@@ -29,7 +29,7 @@ public class DataLoadController : ControllerBase
             //DB에서 체크
             using MysqlManager manager = new MysqlManager(_conf, _realDbConnector);
             
-            var playerInfo = await manager.SelectGamePlayerQuery(request.UUID);
+            var playerInfo = await manager.SelectGamePlayerQuery(request.PlayerID);
             if (null == playerInfo)
             {
                 response.Result = ErrorCode.Load_Fail_NotUser;
@@ -37,7 +37,7 @@ public class DataLoadController : ControllerBase
             }
             
             _logger.ZLogInformation($"Player Data Load Completed!!"); 
-            _logger.ZLogInformation($"UUID: {playerInfo.UUID}");
+            _logger.ZLogInformation($"PlayerID: {playerInfo.PlayerID}");
             _logger.ZLogInformation($"ID: {playerInfo.ID}");
             _logger.ZLogInformation($"Level: {playerInfo.Level}");
             _logger.ZLogInformation($"Exp: {playerInfo.Exp}");
@@ -59,7 +59,7 @@ public class DataLoadController : ControllerBase
 public class LoadRequest
 {
     public string ID { get; set; }
-    public string UUID { get; set; }
+    public string PlayerID { get; set; }
     public string AuthToken { get; set; }
 }
 

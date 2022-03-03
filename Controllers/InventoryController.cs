@@ -27,7 +27,7 @@ public class InventoryController : ControllerBase
         {
             using MysqlManager manager = new MysqlManager(_conf,_realDbConnector);
             
-            var invenList = await manager.SelectMultipleInventoryQuery(request.UUID);
+            var invenList = await manager.SelectMultipleInventoryQuery(request.PlayerID);
             if (invenList.Count == 0)
             {
                 _logger.ZLogError("Inventory is Empty!");
@@ -36,7 +36,7 @@ public class InventoryController : ControllerBase
             }
             
             //item, Inventory 테이블간 Join
-            var itemList = await manager.SelectAllInventoryItems(request.UUID);
+            var itemList = await manager.SelectAllInventoryItems(request.PlayerID);
             response.ItemList = itemList;
             return response;
         }
@@ -52,7 +52,7 @@ public class InventoryController : ControllerBase
 public class InventoryRequest
 {
     public string ID { get; set; }
-    public string UUID { get; set; }
+    public string PlayerID { get; set; }
     public string AuthToken { get; set; }
 }
 

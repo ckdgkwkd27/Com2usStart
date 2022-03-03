@@ -27,7 +27,7 @@ public class ReceiveMailController : ControllerBase
         {
             using MysqlManager manager = new MysqlManager(_conf, _realDbConnector);
             
-            var mailList = await manager.SelectMultipleMailQuery(request.UUID);
+            var mailList = await manager.SelectMultipleMailQuery(request.PlayerID);
             if (mailList.Count == 0)
             {
                 _logger.ZLogError("Mail Is Empty!");
@@ -37,7 +37,7 @@ public class ReceiveMailController : ControllerBase
 
             foreach (var mail in mailList)
             {
-                var insertCount = await manager.InsertItemToInventory(mail.UUID, mail.ItemID, mail.Amount);
+                var insertCount = await manager.InsertItemToInventory(mail.PlayerID, mail.ItemID, mail.Amount, mail.ItemName, mail.ItemType);
                 if (insertCount != 1)
                 {
                     _logger.ZLogError("Wrong Player ID");
@@ -46,7 +46,7 @@ public class ReceiveMailController : ControllerBase
                 }
             }
 
-            var delCount = await manager.DeleteMails(request.UUID);
+            var delCount = await manager.DeleteMails(request.PlayerID);
             if (delCount == 0)
             {
                 _logger.ZLogError("Invalid Item Receive");
@@ -68,7 +68,7 @@ public class ReceiveMailController : ControllerBase
 public class ReceiveRequest
 {
     public string ID { get; set; }
-    public string UUID { get; set; }
+    public string PlayerID { get; set; }
     public string AuthToken { get; set; }
 }
 

@@ -1,7 +1,6 @@
 ﻿using System.Text;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using ZLogger;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace com2us_start.Middleware;
 
@@ -24,15 +23,15 @@ public class TokenCheckMiddleware
             StreamReader bodystream = new StreamReader(httpContext.Request.Body, Encoding.Default);
 
             var body = await bodystream.ReadToEndAsync();
-            var obj = (JObject)JsonConvert.DeserializeObject(body);
+            var obj = JsonSerializer.Deserialize<UserInfo>(body);
+
+            var id = obj?.Id;
+            var token = obj?.AuthToken;
             
-            var Id = (string)obj["ID"];
-            var token = (string)obj["AuthToken"];
-            
-            _logger.ZLogInformation($"ID: {Id}, Token: {token} in TokenCheckMiddleware");
+            _logger.ZLogInformation($"ID: {id}, Token: {token} in TokenCheckMiddleware");
             
             //Token 확인
-            ErrorCode result = await RedisManager.Instance.TokenCheck(Id, token);
+            ErrorCode result = await RedisManager._realRedisConnector.TokenCheck(id, token);
             if (result == ErrorCode.Token_Fail_NotAuthorized)
             {
                 return;
@@ -42,4 +41,10 @@ public class TokenCheckMiddleware
         }
         await _requestDelegate(httpContext); 
     }
+}
+
+class UserInfo
+{
+    public string? Id { get; set; }
+    public string? AuthToken { get; set; }
 }

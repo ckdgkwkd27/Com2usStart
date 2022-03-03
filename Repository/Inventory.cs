@@ -2,7 +2,9 @@
 
 public class Inventory
 {
-    public string UUID { get; set; }
+    public string PlayerID { get; set; }
     public string? ItemID { get; set; }
     public Int32 Amount { get; set; }
+    public string ItemName { get; set; }
+    public string ItemType { get; set; }
 }

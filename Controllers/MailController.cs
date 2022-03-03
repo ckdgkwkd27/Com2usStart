@@ -27,7 +27,7 @@ public class MailController : ControllerBase
         {
             using MysqlManager manager = new MysqlManager(_conf, _realDbConnector);
             
-            var mailList = await manager.SelectMultipleMailQuery(request.UUID);
+            var mailList = await manager.SelectMultipleMailQuery(request.PlayerID);
             if (mailList.Count == 0)
             {
                 _logger.ZLogError("Mail Is Empty!");
@@ -52,7 +52,7 @@ public class MailController : ControllerBase
 public class MailRequest
 {
     public string ID { get; set; }
-    public string UUID { get; set; }
+    public string PlayerID { get; set; }
     public string AuthToken { get; set; }
 }
 

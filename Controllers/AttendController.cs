@@ -29,7 +29,7 @@ public class AttendController : ControllerBase
         {
             using MysqlManager manager = new MysqlManager(_conf, _realDbConnector);
             
-            var attendInfo = await manager.SelectGamePlayerQuery(request.UUID);
+            var attendInfo = await manager.SelectGamePlayerQuery(request.PlayerID);
             if (attendInfo == null)
             {
                 _logger.ZLogError("Wrong User ID");
@@ -40,7 +40,7 @@ public class AttendController : ControllerBase
             var elapsed = DateTime.Now - attendInfo.AttendDate;
             if(elapsed.Days >= 1)
             {
-                var memberUpdateCount = await manager.UpdatePlayerAttend(request.UUID);
+                var memberUpdateCount = await manager.UpdatePlayerAttend(request.PlayerID);
                 if (memberUpdateCount != 1)
                 {
                     _logger.ZLogError("ERROR: Attend Update Failed!");
@@ -63,7 +63,7 @@ public class AttendController : ControllerBase
 public class AttendRequest
 {
     public string ID { get; set; }
-    public string UUID { get; set; }
+    public string PlayerID { get; set; }
     public string AuthToken { get; set; }
 }
 
