@@ -19,22 +19,22 @@ DB에서 계정이 유효한지 확인합니다.
 http://localhost:7038/PlayerCreate: (플레이어 생성)  ID, AuthToken 값을 전달하고 
 일치하면 플레이어를 생성합니다.
 
-http://localhost:7038/DataLoad: (데이터 로드)  ID, UUID, AuthToken 값을 전달하고 
+http://localhost:7038/DataLoad: (데이터 로드)  ID, PlayerID, AuthToken 값을 전달하고 
 일치하면 플레이어 데이터를 로드합니다.
 
-http://localhost:7038/Attend: (출석) ID, UUID, AuthToken 값을 전달하고 일치하면 
+http://localhost:7038/Attend: (출석) ID, PlayerID, AuthToken 값을 전달하고 일치하면 
 DB에 출석기록을 추가/업데이트 합니다.
 
-http://localhost:7038/AttendGift (출석보상) ID, UUID, AuthToken 값을 전달, 일치여부를 확인합니다.
+http://localhost:7038/AttendGift (출석보상) ID, PlayerID, AuthToken 값을 전달, 일치여부를 확인합니다.
 플레이어가 보상을 받은지 일정기간이 지났다면 보상을 지급하고 편지를 발송합니다.
 
-http://localhost:7038/Mail (우편함) ID, UUID, AuthToken 값을 전달하고 일치여부를 확인합니다. 
+http://localhost:7038/Mail (우편함) ID, PlayerID, AuthToken 값을 전달하고 일치여부를 확인합니다. 
 수신된 모든 메일을 보여줍니다.
 
-http://localhost:7038/ReceiveMail (우편수령) ID, UUID, AuthToken 값을 전달하고 일치여부를 확인합니다. 
+http://localhost:7038/ReceiveMail (우편수령) ID, PlayerID, AuthToken 값을 전달하고 일치여부를 확인합니다. 
 수신된 모든 메일의 보상을 인벤토리로 수령하고 메일을 삭제합니다.
 
-http://localhost:7038/Inventory (인벤토리) ID, UUID, AuthToken 값을 전달하고 일치여부를 확인합니다. 
+http://localhost:7038/Inventory (인벤토리) ID, PlayerID, AuthToken 값을 전달하고 일치여부를 확인합니다. 
 인벤토리 정보를 출력합니다.
 ```
 <br/>
