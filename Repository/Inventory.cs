@@ -2,7 +2,7 @@
 
 public class Inventory
 {
-    public string PlayerID { get; set; }
+    public Int32 PlayerID { get; set; }
     public string? ItemID { get; set; }
     public Int32 Amount { get; set; }
     public string ItemName { get; set; }

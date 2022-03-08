@@ -3,7 +3,7 @@
 public class RobotmonInfoTableImpl : ICsvTableBase
 {
     public static List<RobotMon> sRobotmonList;
-    private IRealDbConnector _realDbConnector;
+    private readonly IRealDbConnector _realDbConnector;
 
     public RobotmonInfoTableImpl(IRealDbConnector realDbConnector)
     {
@@ -20,8 +20,6 @@ public class RobotmonInfoTableImpl : ICsvTableBase
         }
 
         Int32 i = 0;
-        using MysqlManager manager = new MysqlManager(conf, _realDbConnector);
-        
         foreach (var list in tableList)
         {
             RobotMon robotMon = new RobotMon();
@@ -35,13 +33,13 @@ public class RobotmonInfoTableImpl : ICsvTableBase
             robotMon.Star = Int32.Parse(list[7]);
             try
             {
-                var rb = await manager.SelectRobotmonQuery(robotMon.RobotmonID);
+                var rb = await _realDbConnector.SelectRobotmon(robotMon.RobotmonID);
                 if (rb != null)
                 {
                     continue;
                 }
                 
-                var count = await manager.InsertRobotmonDirect(robotMon);
+                var count = await _realDbConnector.InsertRobotmonDirect(robotMon);
                 if (count != 1)
                 {
                     Console.WriteLine("Insert RobotMon Error!");

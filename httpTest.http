@@ -22,7 +22,7 @@ Content-Type: application/json
 
 {
   "ID":"test",
-  "AuthToken": "cbf9g04tkyru2vb1b966ac8hb"
+  "AuthToken": "ba26n65egjemh06n7zhc6ftr9"
 }
 
 ###
@@ -31,8 +31,8 @@ Content-Type: application/json
 
 {
   "ID": "test",
-  "PlayerID": "a75fc0d3-bb50-4a4e-8835-12ed7c9fefdf",
-  "AuthToken":"cbf9g04tkyru2vb1b966ac8hb"
+  "PlayerID": "14",
+  "AuthToken":"ba26n65egjemh06n7zhc6ftr9"
 }
 
 ###
@@ -41,18 +41,8 @@ Content-Type: application/json
 
 {
   "ID":"test",
-  "PlayerID":"a75fc0d3-bb50-4a4e-8835-12ed7c9fefdf",
-  "AuthToken":"cbf9g04tkyru2vb1b966ac8hb"
-}
-
-###
-POST http://localhost:7038/AttendGift
-Content-Type: application/json
-
-{
-  "ID":"test",
-  "PlayerID":"a75fc0d3-bb50-4a4e-8835-12ed7c9fefdf",
-  "AuthToken":"cbf9g04tkyru2vb1b966ac8hb"
+  "PlayerID":"14",
+  "AuthToken":"ba26n65egjemh06n7zhc6ftr9"
 }
 
 ###
@@ -61,8 +51,8 @@ Content-Type: application/json
 
 {
   "ID":"test",
-  "PlayerID": "a75fc0d3-bb50-4a4e-8835-12ed7c9fefdf",
-  "AuthToken": "cbf9g04tkyru2vb1b966ac8hb"
+  "PlayerID": "14",
+  "AuthToken": "ba26n65egjemh06n7zhc6ftr9"
 }
 
 ###
@@ -71,8 +61,8 @@ Content-Type: application/json
 
 {
   "ID":"test",
-  "PlayerID": "a75fc0d3-bb50-4a4e-8835-12ed7c9fefdf",
-  "AuthToken": "cbf9g04tkyru2vb1b966ac8hb"
+  "PlayerID": "14",
+  "AuthToken": "ba26n65egjemh06n7zhc6ftr9"
 }
 
 ###
@@ -81,6 +71,6 @@ Content-Type: application/json
 
 {
   "ID":"test",
-  "PlayerID": "a75fc0d3-bb50-4a4e-8835-12ed7c9fefdf",
-  "AuthToken": "cbf9g04tkyru2vb1b966ac8hb"
+  "PlayerID": "14",
+  "AuthToken": "ba26n65egjemh06n7zhc6ftr9"
 }

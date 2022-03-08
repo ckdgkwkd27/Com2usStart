@@ -2,7 +2,7 @@
 
 public class Mail
 {
-    public string PlayerID { get; set; }
+    public Int32 PlayerID { get; set; }
     public string MailID { get; set; }
     public string? ItemID { get; set; }
     public string? RecvID { get; set; }

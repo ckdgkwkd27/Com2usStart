@@ -22,28 +22,24 @@ public class DataLoadController : ControllerBase
     [HttpPost]
     public async Task<LoadResponse> Post(LoadRequest request)
     {
-        var response = new LoadResponse() { Result = ErrorCode.None };
+        var response = new LoadResponse();
 
         try
         {
             //DB에서 체크
-            using MysqlManager manager = new MysqlManager(_conf, _realDbConnector);
-            
-            var playerInfo = await manager.SelectGamePlayerQuery(request.PlayerID);
-            if (null == playerInfo)
+            var playerInfo = await _realDbConnector.SelectGamePlayer(request.PlayerID);
+            if (playerInfo == null)
             {
-                response.Result = ErrorCode.Load_Fail_NotUser;
+                response.Result = ErrorCode.Load_Fail_Wrong_PlayerID;
                 return response;
             }
             
-            _logger.ZLogInformation($"Player Data Load Completed!!"); 
-            _logger.ZLogInformation($"PlayerID: {playerInfo.PlayerID}");
-            _logger.ZLogInformation($"ID: {playerInfo.ID}");
-            _logger.ZLogInformation($"Level: {playerInfo.Level}");
-            _logger.ZLogInformation($"Exp: {playerInfo.Exp}");
-            _logger.ZLogInformation($"GameMoney: {playerInfo.GameMoney}");
-
-            response.Player = playerInfo;
+            _logger.ZLogDebug($"Player Data Load Completed!!"); 
+            _logger.ZLogDebug($"PlayerID: {playerInfo.PlayerID}");
+            _logger.ZLogDebug($"ID: {playerInfo.ID}");
+            _logger.ZLogDebug($"Level: {playerInfo.Level}");
+            _logger.ZLogDebug($"Exp: {playerInfo.Exp}");
+            _logger.ZLogDebug($"GameMoney: {playerInfo.GameMoney}");
         }
         catch (Exception ex)
         {
@@ -65,8 +61,9 @@ public class LoadRequest
 
 public class LoadResponse
 {
+    public LoadResponse() { Result = ErrorCode.None;}
+
     public ErrorCode Result { get; set; }
-    public GamePlayer? Player { get; set; }
 }
 
 

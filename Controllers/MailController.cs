@@ -21,13 +21,11 @@ public class MailController : ControllerBase
     [HttpPost]
     public async Task<MailResponse> Post(MailRequest request)
     {
-        var response = new MailResponse() { Result = ErrorCode.None };
+        var response = new MailResponse();
 
         try
         {
-            using MysqlManager manager = new MysqlManager(_conf, _realDbConnector);
-            
-            var mailList = await manager.SelectMultipleMailQuery(request.PlayerID);
+            var mailList = await _realDbConnector.SelectMail(request.PlayerID);
             if (mailList.Count == 0)
             {
                 _logger.ZLogError("Mail Is Empty!");
@@ -56,8 +54,9 @@ public class MailRequest
     public string AuthToken { get; set; }
 }
 
-public class MailResponse 
+public class MailResponse
 {
+    public MailResponse() { Result = ErrorCode.None;}
     public ErrorCode Result { get; set; }
     public List<Mail> RecvMail { get; set; }
 }

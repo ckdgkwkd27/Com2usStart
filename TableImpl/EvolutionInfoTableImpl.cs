@@ -21,7 +21,6 @@ public class EvolutionInfoTableImpl : ICsvTableBase
         }
 
         Int32 i = 0;
-        using MysqlManager manager = new MysqlManager(conf, _realDbConnector);
         
         foreach (var list in tableList)
         {
@@ -32,7 +31,7 @@ public class EvolutionInfoTableImpl : ICsvTableBase
 
             try
             {
-                var count = await manager.RobotmonUpgradeInsertAndUpdate(ru);
+                var count = await _realDbConnector.RobotmonUpgradeInsertAndUpdate(ru);
                 if (count != 1)
                 {
                     Console.WriteLine("Upgrade Info Query Error!");

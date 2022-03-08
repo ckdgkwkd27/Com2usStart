@@ -1,37 +1,28 @@
 ﻿using System.Security.Cryptography;
 using CloudStructures;
 using CloudStructures.Structures;
+using com2us_start;
 
 namespace com2us_start;
 
 public class RealRedisConnector : IRealRedisConnector
 {
-    private string RedisAddress;
-    private const string allowableCharacters = "abcdefghijklmnopqrstuvwxyz0123456789";
-    public RedisConnection RedisConn { get; set; }
+    private const string AllowableCharacters = "abcdefghijklmnopqrstuvwxyz0123456789";
+    public static RedisConnection RedisConn { get; set; }
 
-    ~RealRedisConnector()
+    public RealRedisConnector(IConfiguration conf)
     {
-        Dispose();    
+        var config = new RedisConfig("com2us", "127.0.0.1");
+        RedisConn = new RedisConnection(config);
     }
     
     public void Dispose()
     {
-        RedisConn.GetConnection().Close();
-        RedisConn.GetConnection().Dispose();
+        Console.WriteLine("Disposing........................................................................");
+        //RedisConn.GetConnection().Close();
+        //RedisConn.GetConnection().Dispose();
     }
     
-    public RedisConnection GetConnector()
-    {
-        return RedisConn;
-    }
-    
-    public void InitConnector(IConfiguration conf)
-    {
-        RedisAddress = conf.GetSection("DBConnection")["Redis"];
-        var config = new RedisConfig("com2us", "127.0.0.1");
-        RedisConn = new RedisConnection(config);
-    }
     public string AuthToken()
     {
         var bytes = new byte[25];
@@ -39,10 +30,10 @@ public class RealRedisConnector : IRealRedisConnector
         {
             random.GetBytes(bytes);
         }
-        return new string(bytes.Select(x => allowableCharacters[x % allowableCharacters.Length]).ToArray());
+        return new string(bytes.Select(x => AllowableCharacters[x % AllowableCharacters.Length]).ToArray());
     }
 
-    public async Task<ErrorCode> TokenCheck(string? id, string? authToken)
+    public static async Task<ErrorCode> TokenCheck(string? id, string? authToken)
     {
         //Redis에서 인증 토큰 체크
         var defaultExpiry = TimeSpan.FromDays(1);

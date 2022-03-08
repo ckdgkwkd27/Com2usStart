@@ -11,14 +11,14 @@ public class PlayerCreateController : ControllerBase
     private readonly ILogger _logger;
     private readonly IConfiguration _conf;
     private readonly IRealDbConnector _realDbConnector;
-    private readonly string playerId;
+    private readonly string _playerId;
 
     public PlayerCreateController(ILogger<PlayerCreateController> logger, IConfiguration conf, IRealDbConnector realDbConnector)
     {
         _logger = logger;
         _conf = conf;
         _realDbConnector = realDbConnector;
-        playerId = Guid.NewGuid().ToString();
+        //_playerId = Guid.NewGuid().ToString();
     }
 
     [HttpPost]
@@ -28,17 +28,15 @@ public class PlayerCreateController : ControllerBase
         
         try
         {
-            using MysqlManager manager = new MysqlManager(_conf,_realDbConnector);
-            
-            var memberInfo = await manager.SelectMemberQuery(request.ID);
-            if (null == memberInfo)
+            var memberInfo = await _realDbConnector.SelectMember(request.ID);
+            if (memberInfo == null)
             {
                 response.Result = ErrorCode.Player_Fail_NotUser;
                 return response;
             }
 
             //Player Data 생성
-            var playerInsertCount = await manager.InsertPlayer(playerId, request.ID,1, 0, gameMoney: 0);
+            var playerInsertCount = await _realDbConnector.InsertPlayer(request.ID,1, 0, gameMoney: 0);
             if (playerInsertCount != 1)
             {
                 _logger.ZLogError("ERROR: Player Create Failed!");
@@ -53,8 +51,7 @@ public class PlayerCreateController : ControllerBase
             return response;
         }
         
-        _logger.ZLogInformation($"Character Create Success!! {playerId}");
-        response.PlayerID = playerId;
+        _logger.ZLogInformation($"Character Create Success!! {_playerId}");
         return response;
     }
 }
@@ -67,6 +64,6 @@ public class PlayerCreateRequest
 
 public class PlayerCreateResponse
 {
-    public string PlayerID { get; set; }
+    public PlayerCreateResponse() { Result = ErrorCode.None;}
     public ErrorCode Result { get; set; }
 }

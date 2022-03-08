@@ -25,17 +25,15 @@ public class JoinController : ControllerBase
     {
         //ZLogger 적용
         _logger.ZLogDebug($"[Request Join] ID:{request.ID}, PW:{request.Password}");
-        
-        var response = new JoinResponse() { Result = ErrorCode.None };
+
+        var response = new JoinResponse();
 
         var saltValue = CryptoManager.Instance.SaltString();
         var hashingPassword = CryptoManager.Instance.MakeHashingPassword(saltValue, request.Password);
         
         try
         {
-            using MysqlManager manager = new MysqlManager(_conf,_realDbConnector);
-            
-            var accountInsertCount =  await manager.InsertAccountQuery(request.ID, hashingPassword, saltValue);
+            var accountInsertCount =  await _realDbConnector.InsertAccountQuery(request.ID, hashingPassword, saltValue);
             if (accountInsertCount != 1)
             {
                 _logger.ZLogError("ERROR: Account Duplicate");
@@ -67,5 +65,6 @@ public class JoinRequest
 
 public class JoinResponse
 {
+    public JoinResponse() { Result = ErrorCode.None;}
     public ErrorCode Result { get; set; }
 }

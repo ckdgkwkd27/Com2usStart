@@ -3,7 +3,7 @@
 //플레이어가 잡은 로봇몬
 public class PlayerRobotmon
 {
-    public string PlayerID { get; set; }
+    public Int32 PlayerID { get; set; }
     public string RobotmonID { get; set; }
     public Int32 Level { get; set; }
     public Int32 HP { get; set; }

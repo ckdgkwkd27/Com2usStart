@@ -21,13 +21,12 @@ public class InventoryController : ControllerBase
     [HttpPost]
     public async Task<InventoryResponse> Post(InventoryRequest request)
     {
-        var response = new InventoryResponse() { Result = ErrorCode.None };
-
+        var response = new InventoryResponse();
+        response.ItemList = new List<InventoryItem>();
+        
         try
         {
-            using MysqlManager manager = new MysqlManager(_conf,_realDbConnector);
-            
-            var invenList = await manager.SelectMultipleInventoryQuery(request.PlayerID);
+            var invenList = await _realDbConnector.SelectInventoryList(request.PlayerID);
             if (invenList.Count == 0)
             {
                 _logger.ZLogError("Inventory is Empty!");
@@ -35,9 +34,18 @@ public class InventoryController : ControllerBase
                 return response;
             }
             
-            //item, Inventory 테이블간 Join
-            var itemList = await manager.SelectAllInventoryItems(request.PlayerID);
-            response.ItemList = itemList;
+            foreach (var item in invenList)
+            {
+                InventoryItem inventoryItem = new InventoryItem
+                {
+                    ItemId = item.ItemID,
+                    ItemName = item.ItemName,
+                    Amount = item.Amount,
+                    ItemType = item.ItemType
+                };
+                response.ItemList.Add(inventoryItem);
+            }
+            
             return response;
         }
         catch (Exception ex)
@@ -58,6 +66,7 @@ public class InventoryRequest
 
 public class InventoryResponse
 {
+    public InventoryResponse() { Result = ErrorCode.None;}
     public ErrorCode Result { get; set; }
     public List<InventoryItem> ItemList { get; set; }
 }

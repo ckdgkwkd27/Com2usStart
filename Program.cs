@@ -22,13 +22,13 @@ var app = builder.Build();
 
 app.UseRouting();
 
-//임시로 미들웨어 껐음
-//app.UseLoggingMiddleware();
-//app.UseTokenCheckMiddleware();
+app.UseLoggingMiddleware();
+app.UseTokenCheckMiddleware();
 
 app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
 
 IConfiguration configuration = app.Configuration;
+RealRedisConnector rc = new RealRedisConnector(configuration);
 
 await CsvTableLoader.Instance.Init(configuration);
 

@@ -25,9 +25,7 @@ public class ReceiveMailController : ControllerBase
         
         try
         {
-            using MysqlManager manager = new MysqlManager(_conf, _realDbConnector);
-            
-            var mailList = await manager.SelectMultipleMailQuery(request.PlayerID);
+            var mailList = await _realDbConnector.SelectMail(request.PlayerID);
             if (mailList.Count == 0)
             {
                 _logger.ZLogError("Mail Is Empty!");
@@ -37,7 +35,7 @@ public class ReceiveMailController : ControllerBase
 
             foreach (var mail in mailList)
             {
-                var insertCount = await manager.InsertItemToInventory(mail.PlayerID, mail.ItemID, mail.Amount, mail.ItemName, mail.ItemType);
+                var insertCount = await _realDbConnector.InsertItemToInventory(mail.PlayerID, mail.ItemID, mail.Amount, mail.ItemName, mail.ItemType);
                 if (insertCount != 1)
                 {
                     _logger.ZLogError("Wrong Player ID");
@@ -46,10 +44,10 @@ public class ReceiveMailController : ControllerBase
                 }
             }
 
-            var delCount = await manager.DeleteMails(request.PlayerID);
+            var delCount = await _realDbConnector.DeleteMails(request.PlayerID);
             if (delCount == 0)
             {
-                _logger.ZLogError("Invalid Item Receive");
+                _logger.ZLogError("Receiving Item is Failed");
                 response.Result = ErrorCode.Recv_Fail_InvalidRecv;
                 return response;
             }
@@ -74,5 +72,6 @@ public class ReceiveRequest
 
 public class ReceiveResponse
 {
+    public ReceiveResponse() { Result = ErrorCode.None;}
     public ErrorCode Result { get; set; }
 }

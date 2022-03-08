@@ -27,7 +27,7 @@ public class CsvTableLoader
     public async Task Init(IConfiguration conf)
     {
         _conf = conf;
-        RealDbConnector realDbConnector = new RealDbConnector();
+        RealDbConnector realDbConnector = new RealDbConnector(conf);
         
         registeredTable.Add("AttendGift.csv", new AttendGiftTableImpl());
         registeredTable.Add("RobotmonInfo.csv", new RobotmonInfoTableImpl(realDbConnector));

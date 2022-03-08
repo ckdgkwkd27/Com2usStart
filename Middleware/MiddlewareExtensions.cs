@@ -12,7 +12,7 @@
         public static IApplicationBuilder UseTokenCheckMiddleware(
             this IApplicationBuilder builder)
         {
-            return builder.UseMiddleware<TokenCheckMiddleware>();
+            return builder.UseMiddleware<AuthCheckMiddleware>();
         }
     }
 }

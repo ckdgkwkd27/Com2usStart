@@ -7,46 +7,42 @@ namespace com2us_start;
 
 public class RealDbConnector : IRealDbConnector
 {
-    private MySqlConnection connection;
-    private string _connectString;
+    private readonly MySqlConnection _connection;
 
-    ~RealDbConnector()
+    public RealDbConnector(IConfiguration conf)
     {
-        Dispose();
+        var connectString = conf.GetSection("DBConnection")["Mysql"];    
+        _connection = new MySqlConnection(connectString);
+
+        Connect();
     }
 
-    public void InitConnector(IConfiguration conf)
+    public void Connect()
     {
-        _connectString = conf.GetSection("DBConnection")["Mysql"];    
-    }
-    
-    public async Task<MySqlConnection> Connect()
-    {
-        connection = new MySqlConnection(_connectString);
-        await connection.OpenAsync();
-        return connection;
+        _connection.Open();
     }
 
     public async Task Disconnect()
     {
-        await connection.CloseAsync();
+        await _connection.CloseAsync();
     }
     
     public void Dispose()
     {
-        connection.Close();
-        connection.Dispose();
-    }
-
-    public async Task<MySqlConnection> GetDbConnection()
-    {
-        return await Connect();
+        Console.WriteLine("Disposing........................................................................");
+        _connection.Close();
+        _connection.Dispose();
     }
     
     public async Task<int> InsertAccountQuery(string id, string password, string salt)
     {
-        await using var conn = await GetDbConnection();
-        var count = await conn.ExecuteAsync(
+        var member = await SelectMember(id);
+        if (member != null)
+        {
+            return -1;
+        }
+        
+        var count = await _connection.ExecuteAsync(
             @"INSERT com2us.account(ID, Password, Salt) Values(@ID, @Pwd, @Salt)",
             new
             {
@@ -58,24 +54,21 @@ public class RealDbConnector : IRealDbConnector
         return count;
     }
 
-    public async Task<Member?> SelectMemberQuery(string Id)
+    public async Task<Member?> SelectMember(string Id)
     {
-        await using var conn = await GetDbConnection();
-        var memberInfo = await conn.QuerySingleOrDefaultAsync<Member>(
+        var memberInfo = await _connection.QuerySingleOrDefaultAsync<Member>(
             @"select * from com2us.account where ID=@id",
             new { id = Id });
 
         return memberInfo;
     }
 
-    public async Task<int> InsertPlayer(string playerId, string id, int level, int exp, int gameMoney)
+    public async Task<int> InsertPlayer(string id, int level, int exp, int gameMoney)
     {
-        await using var conn = await GetDbConnection();
-        var count = await conn.ExecuteAsync(
-            @"INSERT com2us.gameplayer(PlayerID, ID, Level, Exp, GameMoney, AttendDate, GiftDate, HowLongDays) VALUES(@PlayerID, @ID, @Level, @Exp, @GameMoney, @NowDate, @UnixDate, 0)",
+        var count = await _connection.ExecuteAsync(
+            @"INSERT com2us.gameplayer(ID, Level, Exp, GameMoney, AttendDate, GiftDate, HowLongDays) VALUES(@ID, @Level, @Exp, @GameMoney, @NowDate, @UnixDate, 0)",
             new
             {
-                PlayerID = playerId,
                 ID = id,
                 Level = level,
                 Exp = exp,
@@ -87,10 +80,9 @@ public class RealDbConnector : IRealDbConnector
         return count;
     }
 
-    public async Task<GamePlayer?> SelectGamePlayerQuery(string Id)
+    public async Task<GamePlayer?> SelectGamePlayer(string Id)
     {
-        await using var conn = await GetDbConnection();
-        var playerInfo = await conn.QuerySingleOrDefaultAsync<GamePlayer>(
+        var playerInfo = await _connection.QuerySingleOrDefaultAsync<GamePlayer>(
             @"select * from com2us.gameplayer where PlayerID=@id",
             new { id = Id });
 
@@ -99,18 +91,16 @@ public class RealDbConnector : IRealDbConnector
 
     public async Task<int> UpdatePlayerAttend(string Id, bool isGiftGiven = false)
     {
-        await using var conn = await GetDbConnection();
         Int32 count;
-
         if (isGiftGiven)
         {
-            count = await conn.ExecuteAsync(
+            count = await _connection.ExecuteAsync(
                 @"UPDATE com2us.gameplayer SET AttendDate=@NowDate, GiftDate=@NowDate, HowLongDays = HowLongDays+1 WHERE PlayerID=@id",
                 new { @NowDate = DateTime.Now, id = Id });
         }
         else
         {
-            count = await conn.ExecuteAsync(
+            count = await _connection.ExecuteAsync(
                 @"UPDATE com2us.gameplayer SET AttendDate=@NowDate WHERE PlayerID=@id",
                 new { @NowDate = DateTime.Now, id = Id });
         }
@@ -121,8 +111,7 @@ public class RealDbConnector : IRealDbConnector
     public async Task<int> InsertMail(string playerId, string recvId, string? itemId, string sendName, int amount, 
         string title, string content, string itemName, string itemType, Int32 money = 0)
     {
-        await using var conn = await GetDbConnection();
-        var count = await conn.ExecuteAsync(
+        var count = await _connection.ExecuteAsync(
             @"INSERT com2us.mail(PlayerID, MailID, RecvID, ItemID, SendName, SendDate, Amount, Title, Content, Money, ItemName, ItemType, IsDeleted) 
                 VALUES(@_playerId, @_mailId, @_recvId, @_itemId,@_sendName, @_sendDate, @_amount, @_title, @_content, @_money, @_itemName, @_itemType, 0)",
             new
@@ -148,7 +137,7 @@ public class RealDbConnector : IRealDbConnector
     {
         var tbl = AttendGiftTableImpl.GiftDict;
         var item = await SelectItemQuery(tbl[player.HowLongDays].ItemId);
-        if (null == item)
+        if (item == null)
         {
             return -1;
         }
@@ -167,10 +156,9 @@ public class RealDbConnector : IRealDbConnector
         return count;
     }
 
-    public async Task<List<Mail>> SelectMultipleMailQuery(string recvId)
+    public async Task<List<Mail>> SelectMail(string recvId)
     {
-        await using var conn = await GetDbConnection();
-        var multi = await conn.QueryMultipleAsync(
+        var multi = await _connection.QueryMultipleAsync(
             @"SELECT * FROM com2us.mail WHERE PlayerID=@id and IsDeleted=0",
             new { id = recvId }).ConfigureAwait(false);
 
@@ -181,28 +169,25 @@ public class RealDbConnector : IRealDbConnector
 
     public async Task<Int32> DeleteMails(string recvId)
     {
-        await using var conn = await GetDbConnection();
-        var count = await conn.ExecuteAsync(
+        var count = await _connection.ExecuteAsync(
             @"UPDATE com2us.mail SET IsDeleted=1 WHERE PlayerID=@ID",
             new { ID = recvId });
 
         return count;
     }
 
-    public async Task<int> InsertItemToInventory(string playerId, string? itemId, int amount, string itemName, string itemType)
+    public async Task<int> InsertItemToInventory(Int32 playerId, string? itemId, int amount, string itemName, string itemType)
     {
-        await using var conn = await GetDbConnection();
-        var count = await conn.ExecuteAsync(
+        var count = await _connection.ExecuteAsync(
             @"INSERT com2us.inventory(PlayerID, ItemID, Amount, ItemName, ItemType) VALUES(@_playerId, @_itemId, @_amount, @_itemName, @_itemType)",
             new { _playerId = playerId, _itemId = itemId, _amount = amount, _itemName = itemName, _itemType = itemType});
 
         return count;
     }
 
-    public async Task<List<Inventory>> SelectMultipleInventoryQuery(string playerId)
+    public async Task<List<Inventory>> SelectInventoryList(string playerId)
     {
-        await using var conn = await GetDbConnection();
-        var multi = await conn.QueryMultipleAsync(
+        var multi = await _connection.QueryMultipleAsync(
             @"SELECT * FROM com2us.inventory WHERE PlayerID=@_playerId",
             new { _playerId = playerId }).ConfigureAwait(false);
 
@@ -213,8 +198,7 @@ public class RealDbConnector : IRealDbConnector
 
     public async Task<Item?> SelectItemQuery(string itemId)
     {
-        await using var conn = await GetDbConnection();
-        var item = await conn.QuerySingleOrDefaultAsync<Item>(
+        var item = await _connection.QuerySingleOrDefaultAsync<Item>(
             @"SELECT * FROM com2us.item WHERE ItemID=@ItemID",
             new { ItemID = itemId });
 
@@ -223,8 +207,7 @@ public class RealDbConnector : IRealDbConnector
 
     public async Task<List<InventoryItem>> SelectAllInventoryItems(string playerId)
     {
-        await using var conn = await GetDbConnection();
-        var multi = await conn.QueryMultipleAsync(
+        var multi = await _connection.QueryMultipleAsync(
             @"SELECT ItemID, ItemName, ItemType, Amount FROM com2us.Inventory WHERE PlayerID = @_playerId",
             new { _playerId = playerId, }).ConfigureAwait(false);
         var items = multi.Read<InventoryItem>().ToList();
@@ -234,8 +217,7 @@ public class RealDbConnector : IRealDbConnector
 
     public async Task<int> InsertRobotmon(int monId, string name, string chr, int level, int hp, int att, int def, int star)
     {
-        await using var conn = await GetDbConnection();
-        var count = await conn.ExecuteAsync(
+        var count = await _connection.ExecuteAsync(
             @"INSERT com2us.robotmon(RobotmonID, Name, Characteristic, Level, HP, Attack, Defense, Star) 
                             VALUES(@_monId, @_name, @_chr, @_level, @_hp, @_att, @_def, @_star)",
             new
@@ -254,8 +236,7 @@ public class RealDbConnector : IRealDbConnector
 
     public async Task<int> InsertRobotmonDirect(RobotMon mon)
     {
-        await using var conn = await GetDbConnection();
-        var count = await conn.ExecuteAsync(
+        var count = await _connection.ExecuteAsync(
             @"INSERT com2us.robotmon(RobotmonID, Name, Characteristic, Level, HP, Attack, Defense, Star) 
                             VALUES(@_monId, @_name, @_chr, @_level, @_hp, @_att, @_def, @_star)",
             new
@@ -272,10 +253,9 @@ public class RealDbConnector : IRealDbConnector
         return count;
     }
 
-    public async Task<RobotMon?> SelectRobotmonQuery(int monId)
+    public async Task<RobotMon?> SelectRobotmon(int monId)
     {
-        await using var conn = await GetDbConnection();
-        var mon = await conn.QuerySingleOrDefaultAsync<RobotMon>(
+        var mon = await _connection.QuerySingleOrDefaultAsync<RobotMon>(
             @"SELECT * FROM com2us.robotmon WHERE RobotmonID=@_monId",
             new { _monId = monId });
         return mon;
@@ -283,8 +263,7 @@ public class RealDbConnector : IRealDbConnector
 
     public async Task<PlayerRobotmon?> SelectPlayerRobotmonQuery(string Id)
     {
-        await using var conn = await GetDbConnection();
-        var playerRobotmonInfo = await conn.QuerySingleOrDefaultAsync<PlayerRobotmon>(
+        var playerRobotmonInfo = await _connection.QuerySingleOrDefaultAsync<PlayerRobotmon>(
             @"select * from com2us.playerrobotmon where PlayerID=@id",
             new { id = Id });
 
@@ -293,8 +272,7 @@ public class RealDbConnector : IRealDbConnector
 
     public async Task<RobotmonUpgrade?> SelectRobotmonUpgrade(Int32 monId)
     {
-        await using var conn = await GetDbConnection();
-        var monUpgrade = await conn.QuerySingleOrDefaultAsync<RobotmonUpgrade>(
+        var monUpgrade = await _connection.QuerySingleOrDefaultAsync<RobotmonUpgrade>(
             @"SELECT * FROM com2us.robotmon_upgrade WHERE RobotmonID=@_monId",
             new { _monId = monId });
         return monUpgrade;
@@ -302,8 +280,7 @@ public class RealDbConnector : IRealDbConnector
 
     public async Task<int> InsertRobotmonUpgradeDirect(RobotmonUpgrade ru)
     {
-        await using var conn = await GetDbConnection();
-        var count = await conn.ExecuteAsync(
+        var count = await _connection.ExecuteAsync(
             @"INSERT com2us.robotmon_upgrade(RobotmonID, EvolveStar, NextEvolveID, Reinforce1, Reinforce2, Reinforce3) 
                             VALUES(@_monId, @_star, @_nextId, @_rf1, @_rf2, @_rf3)",
             new
@@ -320,8 +297,7 @@ public class RealDbConnector : IRealDbConnector
 
     public async Task<int> UpdateRobotmonUpgradeDirect(RobotmonUpgrade ru)
     {
-        await using var conn = await GetDbConnection();
-        var count = await conn.ExecuteAsync(
+        var count = await _connection.ExecuteAsync(
             @"UPDATE com2us.robotmon_upgrade SET Reinforce1=@_rf1, Reinforce2=@_rf2, Reinforce3=@_rf3 WHERE RobotmonID=@_id",
             new
             {

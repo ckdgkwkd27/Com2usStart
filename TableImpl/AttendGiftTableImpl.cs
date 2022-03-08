@@ -22,12 +22,14 @@ public class AttendGiftTableImpl : ICsvTableBase
         Int32 i = 0;
         foreach (var list in tableList)
         {
-            AttendGiftTableMember tbl = new AttendGiftTableMember();
-            //tbl.Days = list[0];
-            tbl.ItemName = list[1];
-            tbl.ItemId = list[2];
-            tbl.ItemType = list[3];
-            tbl.Amount = list[4];
+            AttendGiftTableMember tbl = new AttendGiftTableMember
+            {
+                //tbl.Days = list[0];
+                ItemName = list[1],
+                ItemId = list[2],
+                ItemType = list[3],
+                Amount = list[4]
+            };
             GiftDict.Add(i, tbl);
             ++i;
         }
